@@ -1,419 +1,185 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>FRZKY CODE | Jasa Pembuatan Bot WhatsApp & Telegram</title>
-<meta name="description" content="Jasa pembuatan bot WhatsApp dan bot Telegram all feature. Request fitur sesuai kebutuhan, bergaransi, support setelah jadi.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FRZKY CODE</title>
 <style>
-:root{--navy:#0b1a45;--blue:#1f4aa8;--blue2:#2e6bd6;--red:#d7222d;--paper:#f2f5fa;--ink:#0e1a33;--muted:#53607a;--line:#c9d2e3;--yellow:#f4c62b;color-scheme:light}
-*{box-sizing:border-box;margin:0}
-:root{padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-behavior:smooth}
-body{background:var(--paper);background-image:linear-gradient(rgba(31,74,168,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(31,74,168,.055) 1px,transparent 1px);background-size:44px 44px;color:var(--ink);font:400 1rem/1.6 "Barlow",system-ui,-apple-system,"Segoe UI",sans-serif}
-h1,h2,h3,.logo,.btn,.price,.stat b{font-family:"Chakra Petch","Barlow",system-ui,sans-serif}
-a{color:inherit}
-code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--blue);font-weight:600;font-size:.88rem}
-:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
-.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-section{padding:68px 0}
-h2{font-size:clamp(1.7rem,4vw,2.4rem);line-height:1.1;text-transform:uppercase;letter-spacing:.01em;margin-bottom:12px;padding-left:16px;border-left:8px solid var(--red);box-shadow:-8px 0 0 -0px #fff,-16px 0 0 0 var(--blue2)}
-h2{margin-left:16px}
-.lead{color:var(--muted);max-width:62ch;margin:0 0 34px 16px}
+  :root { --g: #00ff5a; --g2: #00b83f; --bg: #000; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); overflow: hidden; }
+  body { font-family: "Courier New", Courier, monospace; color: var(--g); }
 
-.top{background:var(--navy);border-bottom:5px solid var(--red);padding-top:env(safe-area-inset-top,0px)}
-.top .wrap{display:flex;justify-content:space-between;align-items:center;height:64px}
-.logo{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:700;font-size:1.2rem;letter-spacing:.04em}
-.logo svg{width:34px;height:34px}
-.logo span{color:var(--yellow)}
-.btn{display:inline-block;background:var(--red);color:#fff;padding:12px 26px;font-weight:700;text-decoration:none;letter-spacing:.03em;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);transition:filter .15s}
-.btn:hover{filter:brightness(1.12)}
-.btn.blue{background:var(--blue2)}
-.btn.ghost{background:#fff;color:var(--navy)}
-.top .btn{padding:9px 20px}
+  #rain { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 
-.hero{margin:36px 0 0;background:var(--navy);color:#fff;padding:52px 48px;display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center;position:relative;overflow:hidden;clip-path:polygon(0 0,calc(100% - 44px) 0,100% 44px,100% 100%,44px 100%,0 calc(100% - 44px));background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 2px,transparent 2px 18px)}
-.hero::before{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;background:linear-gradient(90deg,var(--red) 0 34%,#fff 34% 67%,var(--blue2) 67%)}
-.tag{display:inline-block;background:var(--red);color:#fff;font:600 .85rem "Chakra Petch",sans-serif;padding:4px 14px;margin-bottom:18px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
-.hero h1{font-size:clamp(2.2rem,5.6vw,3.8rem);line-height:1.04;text-transform:uppercase;margin-bottom:18px}
-.hero p{color:#c9d6f2;max-width:50ch;margin-bottom:26px;font-size:1.06rem}
-.cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:30px}
-.stats{display:flex;gap:12px;flex-wrap:wrap}
-.stat{border:2px solid rgba(255,255,255,.28);border-left:6px solid var(--yellow);padding:6px 16px;min-width:108px}
-.stat b{display:block;font-size:1.5rem;line-height:1.2}
-.stat span{font-size:.82rem;color:#b5c4e6}
+  /* judul di tengah */
+  .center { position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none; z-index: 2; text-align: center; padding: 1rem; }
+  h1 {
+    font-size: clamp(2.2rem, 10vw, 7rem);
+    letter-spacing: .08em; font-weight: 700; color: var(--g);
+    text-shadow: 0 0 8px var(--g), 0 0 28px var(--g2), 0 0 60px var(--g2);
+    background: rgba(0,0,0,.55); padding: .15em .4em; position: relative;
+  }
+  h1::before, h1::after { content: attr(data-t); position: absolute; inset: 0; padding: inherit; background: transparent; }
+  h1::before { color: #0ff; transform: translate(-2px,0); clip-path: inset(0 0 60% 0); animation: gl 3.2s infinite steps(1); mix-blend-mode: screen; text-shadow: none; }
+  h1::after  { color: #f0f; transform: translate(2px,0);  clip-path: inset(55% 0 0 0); animation: gl 2.7s infinite steps(1) reverse; mix-blend-mode: screen; text-shadow: none; }
+  @keyframes gl {
+    0%,88%,100% { transform: translate(0,0); opacity: 0; }
+    90% { transform: translate(-4px,1px); opacity: .9; }
+    93% { transform: translate(3px,-1px); opacity: .9; }
+    96% { transform: translate(-2px,0); opacity: .9; }
+  }
+  .sub { margin-top: .8rem; font-size: clamp(.8rem, 2.4vw, 1.1rem); color: var(--g); text-shadow: 0 0 8px var(--g2); background: rgba(0,0,0,.55); display: inline-block; padding: .2em .6em; }
+  .sub::after { content: "_"; animation: bl 1s steps(1) infinite; }
+  @keyframes bl { 50% { opacity: 0; } }
 
-.visual{position:relative;min-height:540px}
-.ring{position:absolute;left:50%;top:170px;width:320px;height:320px;transform:translate(-50%,-50%);border:2px dashed rgba(255,255,255,.25);border-radius:50%}
-.ring::after{content:"";position:absolute;inset:26px;border:2px solid rgba(46,107,214,.7);border-radius:50%}
-.bigmecha{position:absolute;left:50%;top:10px;width:320px;height:320px;transform:translateX(-50%);filter:drop-shadow(0 12px 30px rgba(0,0,0,.45))}
-.chat{position:absolute;right:0;bottom:0;width:264px;background:#fff;color:var(--ink);border-top:6px solid var(--red);box-shadow:0 14px 30px rgba(0,0,0,.4)}
-.chat-h{display:flex;align-items:center;gap:8px;background:var(--blue);color:#fff;padding:8px 12px;font:600 .88rem "Chakra Petch",sans-serif}
-.chat-h i{width:9px;height:9px;border-radius:50%;background:#52e08a;display:inline-block}
-.msgs{display:flex;flex-direction:column;gap:6px;padding:12px}
-.msg{max-width:88%;padding:6px 10px;font-size:.82rem;line-height:1.35;opacity:0;transform:translateY(6px);animation:pop .4s forwards}
-.msg.me{align-self:flex-end;background:#dbe6fb}
-.msg.bot{align-self:flex-start;background:#eef1f7;border-left:3px solid var(--red)}
-.msg:nth-child(1){animation-delay:.4s}.msg:nth-child(2){animation-delay:1.2s}.msg:nth-child(3){animation-delay:2.2s}.msg:nth-child(4){animation-delay:3.1s}
-@keyframes pop{to{opacity:1;transform:none}}
 
-.card{background:#fff;border:2px solid var(--navy);position:relative}
-.card::after{content:"";position:absolute;top:-2px;right:-2px;border-style:solid;border-width:0 26px 26px 0;border-color:transparent var(--red) transparent transparent}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-.svc{padding:26px}
-.svc h3{font-size:1.4rem;text-transform:uppercase;margin-bottom:6px}
-.svc p{color:var(--muted)}
-.svc.wa{border-top:8px solid var(--blue2)}
-.svc.tg{border-top:8px solid var(--red)}
+  /* tombol suara */
+  #snd {
+    position: fixed; right: 14px; bottom: 14px; z-index: 5; font: inherit; font-size: .85rem;
+    color: var(--g); background: rgba(0,0,0,.7); border: 1px solid var(--g2); padding: .5em .9em; cursor: pointer;
+  }
+  #snd:hover, #snd:focus-visible { border-color: var(--g); outline: none; box-shadow: 0 0 10px var(--g2); }
 
-.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-.fcard{padding:0}
-.fcard h3{background:var(--navy);color:#fff;font-size:1.02rem;text-transform:uppercase;letter-spacing:.03em;padding:10px 40px 10px 16px;border-bottom:4px solid var(--red)}
-.fcard>p{font-size:.9rem;color:var(--muted);padding:12px 16px 0}
-.cmds{list-style:none;padding:12px 16px 18px;display:grid;gap:10px}
-.cmds li{display:flex;flex-direction:column;gap:1px;font-size:.88rem;color:var(--muted);border-left:3px solid var(--line);padding-left:10px}
+  /* player YouTube disembunyikan tapi tetap aktif */
+  #yt { position: fixed; left: 0; bottom: 0; width: 220px; height: 220px; opacity: 0.01; pointer-events: none; z-index: -1; }
+  #yt.off { display: none; }
 
-.fcard:last-child{grid-column:1/-1}
-.fcard:last-child .cmds{grid-template-columns:repeat(3,1fr);gap:12px 22px}
-.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch}
-.plan{padding:28px;display:flex;flex-direction:column}
-.plan.hot{border-color:var(--red);box-shadow:8px 8px 0 var(--navy)}
-.plan.hot::after{border-right-color:var(--navy)}
-.plan h3{font-size:1.25rem;text-transform:uppercase}
-.price{font-size:2rem;font-weight:700;margin:8px 0 14px;color:var(--blue)}
-.price small{font:400 .85rem "Barlow",sans-serif;color:var(--muted)}
-.plan ul{padding-left:18px;color:var(--muted);margin-bottom:22px;flex:1}
-.plan li{margin-bottom:6px}
-.plan .btn{text-align:center}
-.note{color:var(--muted);font-size:.88rem;margin:16px 0 0 16px}
-
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;list-style:none;padding:0}
-.steps li{background:#fff;border:2px solid var(--navy);padding:18px;position:relative;counter-increment:s}
-.steps li::before{content:counter(s);position:absolute;top:-2px;left:-2px;background:var(--red);color:#fff;font:700 1rem "Chakra Petch",sans-serif;width:32px;height:32px;display:grid;place-items:center}
-.steps ol,.steps{counter-reset:s}
-.steps b{display:block;font:700 1.05rem "Chakra Petch",sans-serif;margin:22px 0 4px;text-transform:uppercase}
-.steps span{color:var(--muted);font-size:.93rem}
-
-.contact{background:var(--navy);color:#fff;text-align:center;padding:52px 28px 60px;position:relative;clip-path:polygon(0 0,calc(100% - 40px) 0,100% 40px,100% 100%,40px 100%,0 calc(100% - 40px));background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 2px,transparent 2px 18px)}
-.contact::before{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;background:linear-gradient(90deg,var(--red) 0 34%,#fff 34% 67%,var(--blue2) 67%)}
-.contact h2{border:0;box-shadow:none;padding:0;margin:0 0 10px;color:#fff}
-.contact p{color:#c9d6f2;margin:0 auto 24px;max-width:48ch}
-footer{text-align:center;color:var(--muted);font-size:.88rem;padding:34px 0 48px}
-
-.snd{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;display:flex;align-items:center;gap:10px;background:var(--navy);color:#fff;border:0;border-bottom:4px solid var(--red);padding:10px 20px;font:700 .9rem "Chakra Petch",sans-serif;cursor:pointer;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
-.snd:hover{filter:brightness(1.2)}
-.eq{display:flex;gap:2px;align-items:flex-end;height:16px}
-.eq i{width:4px;height:5px;background:var(--yellow);display:block}
-.snd[aria-pressed="true"] .eq i{animation:eq .6s ease-in-out infinite alternate}
-.eq i:nth-child(2){animation-delay:.15s}.eq i:nth-child(3){animation-delay:.3s}
-@keyframes eq{to{height:16px}}
-@media (max-width:860px){
-  .fcard:last-child .cmds{grid-template-columns:1fr 1fr}
-  .hero{grid-template-columns:1fr;padding:40px 24px 48px}
-  .visual{min-height:560px}
-  .grid2,.plans{grid-template-columns:1fr}
-  .fgrid{grid-template-columns:1fr 1fr}
-  .steps{grid-template-columns:1fr 1fr}
-  section{padding:50px 0}
-}
-@media (max-width:560px){.top .btn{padding:8px 14px;font-size:.88rem}.logo{font-size:1.05rem}.stat{min-width:0;flex:1}.fgrid,.steps,.fcard:last-child .cmds{grid-template-columns:1fr}.visual{min-height:500px}.chat{width:100%}.bigmecha{width:250px;height:250px}.ring{width:270px;height:270px;top:135px}}
-@media (prefers-reduced-motion:reduce){.snd[aria-pressed="true"] .eq i{animation:none;height:12px}.msg{animation:none;opacity:1;transform:none}html{scroll-behavior:auto}}
+  @media (prefers-reduced-motion: reduce) { h1::before, h1::after { animation: none; opacity: 0; } .sub::after { animation: none; } }
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="mecha" viewBox="0 0 240 240">
-  <g stroke="#0b1a45" stroke-width="3" stroke-linejoin="round">
-    <polygon fill="#f4c62b" points="116,84 52,8 44,36 96,92"/>
-    <polygon fill="#f4c62b" points="124,84 188,8 196,36 144,92"/>
-    <polygon fill="#1f4aa8" points="68,86 120,34 172,86 166,106 74,106"/>
-    <polygon fill="#d7222d" points="106,34 134,34 140,60 100,60"/>
-    <polygon fill="#2e6bd6" points="54,112 72,104 74,174 56,152"/>
-    <polygon fill="#2e6bd6" points="186,112 168,104 166,174 184,152"/>
-    <polygon fill="#ffffff" points="76,106 164,106 170,154 150,208 90,208 70,154"/>
-    <polygon fill="#7fe6ff" points="86,126 114,130 112,144 88,141"/>
-    <polygon fill="#7fe6ff" points="154,126 126,130 128,144 152,141"/>
-    <polygon fill="#d7222d" points="96,196 144,196 150,208 90,208"/>
-  </g>
-  <g stroke="#53607a" stroke-width="3" stroke-linecap="round"><path d="M104 168h32M104 178h32"/></g>
-</symbol></svg>
-<div class="top"><div class="wrap">
-  <a class="logo" href="#"><svg aria-hidden="true"><use href="#mecha"/></svg>FRZKY<span>CODE</span></a>
-  <a class="btn" href="#kontak">Order sekarang</a>
-</div></div>
 
-<div class="wrap">
-  <header class="hero">
-    <div>
-      <span class="tag">Jasa bot WhatsApp dan Telegram</span>
-      <h1>Bot all feature, dibuat sesuai kebutuhan lu.</h1>
-      <p>FRZKY CODE bikin bot WhatsApp dan Telegram: downloader, stiker, AI chat, video lirik, efek video, game, sampai moderasi grup. Fitur bisa request, bot langsung jalan.</p>
-      <div class="cta">
-        <a class="btn" href="https://wa.me/6282221112027" target="_blank" rel="noopener">Chat via WhatsApp</a>
-        <a class="btn ghost" href="#paket">Lihat paket</a>
-      </div>
-      <div class="stats">
-        <div class="stat"><b>70+</b><span>perintah</span></div>
-        <div class="stat"><b>10</b><span>kategori fitur</span></div>
-        <div class="stat"><b>2</b><span>platform</span></div>
-      </div>
-    </div>
-    <div class="visual">
-      <div class="ring" aria-hidden="true"></div>
-      <svg class="bigmecha" role="img" aria-label="Ilustrasi kepala robot"><use href="#mecha"/></svg>
-      <div class="chat" aria-label="Contoh percakapan dengan bot">
-        <div class="chat-h"><i></i>FRZKY Bot online</div>
-        <div class="msgs">
-          <div class="msg me">.menu</div>
-          <div class="msg bot">Ada 70+ fitur: downloader, stiker, AI, video lirik, game, admin grup.</div>
-          <div class="msg me">.s (kirim foto)</div>
-          <div class="msg bot">Stiker jadi dalam 2 detik ✅</div>
-        </div>
-      </div>
-    </div>
-  </header>
+<canvas id="rain"></canvas>
 
-  <section id="layanan">
-    <h2>Layanan</h2>
-    <p class="lead">Dua platform, satu tujuan: bikin kerjaan lu otomatis.</p>
-    <div class="grid2">
-      <div class="card svc wa"><h3>Bot WhatsApp</h3><p>Cocok buat grup komunitas, toko online, atau layanan pelanggan. Jalan 24 jam dengan banyak command.</p></div>
-      <div class="card svc tg"><h3>Bot Telegram</h3><p>Stabil dan fleksibel: tombol interaktif, channel manager, pembayaran, dan notifikasi otomatis.</p></div>
-    </div>
-  </section>
-
-  <section id="fitur">
-    <h2>Fitur bot</h2>
-    <p class="lead">Ini fitur yang sudah jalan di bot FRZKY, total 70+ perintah dalam 10 kategori. Bisa dipilih sesuai paket, dan fitur lain bisa request. Bot juga bisa dua bahasa (Indonesia dan Inggris) lewat <code>.lang</code>.</p>
-    <div class="fgrid">
-      <div class="card fcard"><h3>Downloader</h3><p>Kirim link langsung, bot yang urus. TikTok tanpa watermark.</p><ul class="cmds">
-        <li><code>link</code><span>TikTok, YouTube, Instagram, Facebook, Pinterest, Threads, CapCut</span></li>
-        <li><code>.mp3 link</code><span>ambil audio dari video</span></li>
-        <li><code>.play judul</code><span>cari lagu, pilih dari daftar tombol</span></li>
-        <li><code>.video judul</code><span>cari video YouTube</span></li>
-        <li><code>.save / .playlist</code><span>simpan dan putar playlist pribadi</span></li>
-      </ul></div>
-      <div class="card fcard"><h3>Stiker</h3><p>Dari foto, video, atau teks jadi stiker.</p><ul class="cmds">
-        <li><code>.s</code><span>foto/video jadi stiker (.s crop, .s Pack|Author)</span></li>
-        <li><code>.toimg</code><span>stiker jadi gambar</span></li>
-        <li><code>.ttp teks</code><span>stiker tulisan</span></li>
-        <li><code>.brat teks</code><span>gaya brat: hijau, putih, hitam</span></li>
-        <li><code>.attp teks</code><span>teks berkedip warna-warni</span></li>
-      </ul></div>
-      <div class="card fcard"><h3>Meme dan teks</h3><p>Bikin konten receh sampai terjemahan.</p><ul class="cmds">
-        <li><code>.smeme / .meme</code><span>meme stiker dan meme gambar</span></li>
-        <li><code>.nulis teks</code><span>tulisan tangan di kertas</span></li>
-        <li><code>.tr en</code><span>terjemah pesan yang dibalas</span></li>
-        <li><code>.lirik judul</code><span>cari lirik lagu</span></li>
-        <li><code>.quote</code><span>kutip pesan jadi gambar</span></li>
-      </ul></div>
-      <div class="card fcard"><h3>Video lirik dan musik</h3><p>Otomatis jadi video, lengkap dengan tema.</p><ul class="cmds">
-        <li><code>.makelyric</code><span>video lirik dari lagu .play, banyak tema, font, dan wave</span></li>
-        <li><code>.addmusic</code><span>ganti atau campur suara video dengan musik</span></li>
-        <li><code>.addalbum link</code><span>album foto jadi slideshow + musik + transisi</span></li>
-        <li><code>.addremix</code><span>gabung 1 video dengan 1 musik sendiri</span></li>
-      </ul></div>
-      <div class="card fcard"><h3>Audio, PDF dan ZIP</h3><p>Alat kantor langsung dari chat.</p><ul class="cmds">
-        <li><code>.cut 15 45</code><span>potong audio jadi MP3 atau VN</span></li>
-        <li><code>.toaudio / .tovn</code><span>video ke MP3 atau voice note</span></li>
-        <li><code>.pdf</code><span>foto jadi PDF, hingga 15 foto</span></li>
-        <li><code>.zip</code><span>bungkus file jadi ZIP</span></li>
-        <li><code>.collage</code><span>gabung 2 sampai 9 foto jadi grid</span></li>
-      </ul></div>
-      <div class="card fcard"><h3>Efek video dan suara</h3><p>Edit video tanpa aplikasi tambahan.</p><ul class="cmds">
-        <li><code>.vc efek</code><span>ubah suara: deep, robot, echo, alien, monster, dll</span></li>
-        <li><code>.speed / .slowmo / .reverse</code><span>atur kecepatan dan putar mundur</span></li>
-        <li><code>.vtrim / .togif / .compress</code><span>potong, jadi GIF, kecilkan ukuran</span></li>
-        <li><code>.vcap atas&#124;bawah</code><span>teks meme di video</span></li>
-        <li><code>.greenscreen (.gs)</code><span>background video jadi layar hijau, pilih warna sendiri</span></li>
-        <li><code>.chroma</code><span>masukin foto ke template CapCut layar hijau</span></li>
-      </ul></div>
-      <div class="card fcard"><h3>Suara TTS dan STT</h3><p>Teks jadi suara, suara jadi teks.</p><ul class="cmds">
-        <li><code>.tts teks</code><span>suara cewek atau cowok</span></li>
-        <li><code>efek</code><span>berat, cempreng, robot, gema, tua, alien, cepat, lambat</span></li>
-        <li><code>18 bahasa</code><span>id, en, ja, ko, zh, ar, es, fr, de, dan lainnya, termasuk jawa dan sunda</span></li>
-        <li><code>.stt</code><span>balas voice note jadi teks</span></li>
-      </ul></div>
-      <div class="card fcard"><h3>AI (Gemini)</h3><p>Tanya jawab dan baca gambar.</p><ul class="cmds">
-        <li><code>.ai pertanyaan</code><span>tanya apa saja</span></li>
-        <li><code>.ai + foto</code><span>AI membaca dan menjelaskan gambar</span></li>
-        <li><code>.img prompt</code><span>buat atau edit gambar dari teks</span></li>
-        <li><code>.ringkas 20</code><span>ringkas 20 pesan terakhir di grup</span></li>
-      </ul></div>
-      <div class="card fcard"><h3>Game</h3><p>Rame-rame di grup.</p><ul class="cmds">
-        <li><code>tebak bendera</code><span>tebak gambar bendera negara</span></li>
-        <li><code>family100</code><span>survei ala Family 100</span></li>
-        <li><code>dan game lain</code><span>bisa ditambah sesuai request</span></li>
-      </ul></div>
-      <div class="card fcard"><h3>Grup dan admin</h3><p>Kontrol penuh buat pemilik bot dan admin grup.</p><ul class="cmds">
-        <li><code>.welcome on&#124;off</code><span>sambutan anggota baru</span></li>
-        <li><code>.antilink on&#124;off</code><span>hapus link undangan otomatis</span></li>
-        <li><code>.tagall / .poll / .infogc</code><span>tag semua, polling, info grup</span></li>
-        <li><code>.ingat 30m minum</code><span>pengingat pribadi</span></li>
-        <li><code>.mode public&#124;private</code><span>atur siapa yang boleh pakai bot</span></li>
-        <li><code>.setpp / .setname / .status</code><span>ganti profil dan cek server bot</span></li>
-      </ul></div>
-    </div>
-  </section>
-
-  <section id="paket">
-    <h2>Paket harga</h2>
-    <p class="lead">Harga di bawah masih contoh. Ganti sesuai harga lu.</p>
-    <div class="plans">
-      <div class="card plan">
-        <h3>Basic</h3>
-        <div class="price">Rp50.000 <small>/ bot</small></div>
-        <ul><li>1 platform (WA atau Telegram)</li><li>Hingga 30 fitur</li><li>Support 3 hari</li></ul>
-        <a class="btn blue" href="https://wa.me/6282221112027?text=Halo%20FRZKY%20CODE%2C%20mau%20order%20paket%20Basic" target="_blank" rel="noopener">Pilih Basic</a>
-      </div>
-      <div class="card plan hot">
-        <h3>Pro</h3>
-        <div class="price">Rp150.000 <small>/ bot</small></div>
-        <ul><li>Hingga 100 fitur</li><li>Sistem premium dan limit</li><li>Setup hosting dibantu</li><li>Support 14 hari</li></ul>
-        <a class="btn" href="https://wa.me/6282221112027?text=Halo%20FRZKY%20CODE%2C%20mau%20order%20paket%20Pro" target="_blank" rel="noopener">Pilih Pro</a>
-      </div>
-      <div class="card plan">
-        <h3>Custom</h3>
-        <div class="price">Nego <small>/ sesuai fitur</small></div>
-        <ul><li>Semua fitur request</li><li>WA + Telegram sekaligus</li><li>Integrasi pembayaran dan API</li><li>Support 30 hari</li></ul>
-        <a class="btn blue" href="https://wa.me/6282221112027?text=Halo%20FRZKY%20CODE%2C%20mau%20order%20bot%20custom" target="_blank" rel="noopener">Tanya custom</a>
-      </div>
-    </div>
-    <p class="note">Hosting/server bot dihitung terpisah, tapi bisa dibantu setup.</p>
-  </section>
-
-  <section id="order">
-    <h2>Cara order</h2>
-    <p class="lead">Simpel, empat langkah.</p>
-    <ol class="steps">
-      <li><b>Chat</b><span>Ceritain bot yang lu mau dan fiturnya.</span></li>
-      <li><b>Deal harga</b><span>Konfirmasi paket dan DP.</span></li>
-      <li><b>Pengerjaan</b><span>Estimasi 1 sampai 5 hari, sesuai fitur.</span></li>
-      <li><b>Serah terima</b><span>Bot dites, lu dapat panduan pakai.</span></li>
-    </ol>
-  </section>
-
-  <section id="kontak">
-    <div class="contact">
-      <h2>Siap bikin bot lu?</h2>
-      <p>Chat aja, kasih tau fitur yang lu butuh. Dibantu sampai bot jalan.</p>
-      <a class="btn" href="https://wa.me/6282221112027" target="_blank" rel="noopener">Chat WhatsApp</a>
-    </div>
-  </section>
-
-  <footer>© 2026 FRZKY CODE. Jasa pembuatan bot WhatsApp dan Telegram.</footer>
+<div class="center">
+  <div>
+    <h1 data-t="FRZKY CODE">FRZKY CODE</h1>
+  </div>
 </div>
-<button id="snd" class="snd" type="button" aria-pressed="false"><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span><b>Musik robot: mati</b></button>
+
+<button id="snd" aria-label="Matikan atau nyalakan suara">SUARA: OFF (klik di mana saja)</button>
+<div id="yt"></div>
+
 <script>
-(function(){
-  var AC=window.AudioContext||window.webkitAudioContext;
-  var btn=document.getElementById("snd");
-  if(!btn) return;
-  if(!AC){ btn.hidden=true; return; }
-  var ctx,bus,send,timer,step=0,next=0,on=false,noise;
-  var BPM=104, SD=60/BPM/4;
-  var BASS=[55,43.65,65.41,49];
-  var ARP=[[220,261.63,329.63,440],[174.61,220,261.63,349.23],[261.63,329.63,392,523.25],[196,246.94,293.66,392]];
-  var PAT=[0,2,1,3,2,1,3,2,0,2,1,3,2,3,1,2];
-  var master;
-  function init(){
-    ctx=new AC();
-    master=ctx.createGain(); master.gain.value=0; master.connect(ctx.destination);
-    bus=ctx.createDynamicsCompressor(); bus.connect(master);
-    var d=ctx.createDelay(1); d.delayTime.value=SD*3;
-    var fb=ctx.createGain(); fb.gain.value=.35; d.connect(fb); fb.connect(d);
-    send=ctx.createGain(); send.gain.value=.4; send.connect(d); d.connect(bus);
-    noise=ctx.createBuffer(1,ctx.sampleRate*.5,ctx.sampleRate);
-    var ch=noise.getChannelData(0); for(var i=0;i<ch.length;i++) ch[i]=Math.random()*2-1;
+/* ---------- MATRIX RAIN ---------- */
+(function () {
+  var c = document.getElementById("rain"), x = c.getContext("2d");
+  var chars = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789ABCDEFXYZ<>{}[]/\\=+*#$%&".split("");
+  var size = 18, cols, drops;
+  function resize() {
+    var d = window.devicePixelRatio || 1;
+    c.width = innerWidth * d; c.height = innerHeight * d;
+    x.setTransform(d, 0, 0, d, 0, 0);
+    size = innerWidth < 600 ? 14 : 18;
+    cols = Math.ceil(innerWidth / size);
+    drops = [];
+    for (var i = 0; i < cols; i++) drops[i] = Math.random() * -50;
+    x.fillStyle = "#000"; x.fillRect(0, 0, innerWidth, innerHeight);
   }
-  function env(g,t,a,dcy,peak){
-    g.gain.setValueAtTime(.0001,t);
-    g.gain.exponentialRampToValueAtTime(peak,t+a);
-    g.gain.exponentialRampToValueAtTime(.0001,t+a+dcy);
+  resize(); addEventListener("resize", resize);
+
+  var last = 0;
+  function draw(t) {
+    requestAnimationFrame(draw);
+    if (t - last < 45) return; last = t;
+    x.fillStyle = "rgba(0,0,0,0.08)";
+    x.fillRect(0, 0, innerWidth, innerHeight);
+    x.font = size + "px monospace";
+    for (var i = 0; i < cols; i++) {
+      var ch = chars[(Math.random() * chars.length) | 0];
+      var px = i * size, py = drops[i] * size;
+      x.fillStyle = "#d8ffe4"; x.fillText(ch, px, py);          /* kepala tetesan: putih kehijauan */
+      x.fillStyle = "#00ff5a"; x.fillText(chars[(Math.random() * chars.length) | 0], px, py - size);
+      if (py > innerHeight && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
   }
-  function pluck(f,t){
-    var o=ctx.createOscillator(),fl=ctx.createBiquadFilter(),g=ctx.createGain();
-    o.type="sawtooth"; o.frequency.value=f; fl.type="lowpass"; fl.Q.value=6;
-    fl.frequency.setValueAtTime(3200,t); fl.frequency.exponentialRampToValueAtTime(350,t+.18);
-    env(g,t,.005,.2,.15);
-    o.connect(fl); fl.connect(g); g.connect(bus); g.connect(send);
-    o.start(t); o.stop(t+.3);
-  }
-  function bass(f,t,dur){
-    var o=ctx.createOscillator(),fl=ctx.createBiquadFilter(),g=ctx.createGain();
-    o.type="sawtooth"; o.frequency.value=f; fl.type="lowpass"; fl.frequency.value=240;
-    g.gain.setValueAtTime(.0001,t); g.gain.linearRampToValueAtTime(.24,t+.03);
-    g.gain.setValueAtTime(.24,t+dur-.12); g.gain.linearRampToValueAtTime(0,t+dur);
-    o.connect(fl); fl.connect(g); g.connect(bus);
-    o.start(t); o.stop(t+dur+.05);
-  }
-  function kick(t){
-    var o=ctx.createOscillator(),g=ctx.createGain();
-    o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(42,t+.14);
-    g.gain.setValueAtTime(.7,t); g.gain.exponentialRampToValueAtTime(.001,t+.2);
-    o.connect(g); g.connect(bus); o.start(t); o.stop(t+.25);
-  }
-  function hat(t,v){
-    var n=ctx.createBufferSource(),hp=ctx.createBiquadFilter(),g=ctx.createGain();
-    n.buffer=noise; hp.type="highpass"; hp.frequency.value=7000;
-    g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.001,t+.05);
-    n.connect(hp); hp.connect(g); g.connect(bus); n.start(t); n.stop(t+.06);
-  }
-  function blip(f,t,len,v){
-    var o=ctx.createOscillator(),g=ctx.createGain();
-    o.type="square"; o.frequency.value=f; env(g,t,.004,len,v);
-    o.connect(g); g.connect(bus); g.connect(send); o.start(t); o.stop(t+len+.02);
-  }
-  function bleep(t){
-    var f=700+Math.random()*900;
-    blip(f,t,.07,.05); blip(f*(Math.random()<.5?1.5:.75),t+SD*.5,.07,.05);
-  }
-  function sched(s,t){
-    var bar=Math.floor(s/16)%4, i=s%16;
-    if(i===0||i===8) bass(BASS[bar],t,SD*8);
-    if(i%4===0) kick(t);
-    if(i%4===2) hat(t,.1); else if(i%2===1) hat(t,.035);
-    pluck(ARP[bar][PAT[i]]*(i===15?2:1),t);
-    if(i===13&&Math.random()<.5) bleep(t);
-  }
-  function tick(){ while(next<ctx.currentTime+.15){ sched(step,next); next+=SD; step++; } }
-  function boot(){
-    var t=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();
-    o.type="sawtooth"; o.frequency.setValueAtTime(110,t); o.frequency.exponentialRampToValueAtTime(880,t+.5);
-    env(g,t,.05,.5,.1); o.connect(g); g.connect(bus); o.start(t); o.stop(t+.6);
-  }
-  function setUI(){
-    btn.setAttribute("aria-pressed",on?"true":"false");
-    btn.querySelector("b").textContent="Musik robot: "+(on?"nyala":"mati");
-  }
-  function start(){
-    if(!ctx) init();
-    ctx.resume();
-    step=0; next=ctx.currentTime+.6;
-    master.gain.cancelScheduledValues(ctx.currentTime);
-    master.gain.setTargetAtTime(.5,ctx.currentTime,.1);
-    boot(); clearInterval(timer); timer=setInterval(tick,30);
-    on=true; setUI();
-  }
-  function stop(){
-    clearInterval(timer);
-    master.gain.setTargetAtTime(0,ctx.currentTime,.08);
-    var c=ctx; setTimeout(function(){ if(!on) c.suspend(); },500);
-    on=false; setUI();
-  }
-  btn.addEventListener("click",function(){ on?stop():start(); });
-  document.addEventListener("click",function(e){
-    if(!on||!e.target.closest) return;
-    if(e.target.closest(".btn")){ var t=ctx.currentTime; blip(880,t,.06,.08); blip(1320,t+.07,.09,.08); }
-  });
-  document.addEventListener("visibilitychange",function(){
-    if(!on||!ctx) return;
-    if(document.hidden) ctx.suspend(); else ctx.resume();
-  });
+  requestAnimationFrame(draw);
 })();
+
+/* ---------- MUSIK (autoplay) ---------- */
+/* PILIH SALAH SATU:
+   1) File MP3 lokal -> isi AUDIO_SRC (mis. "musik.mp3", taruh sefolder dengan index.html). Paling stabil, jalan juga di file://
+   2) YouTube -> kosongkan AUDIO_SRC dan isi VIDEO_ID (harus lewat http/https, video harus boleh di-embed) */
+var AUDIO_SRC = "";
+var VIDEO_ID = "36Q29xD2aGQ";
+
+var player, audio, ready = false, soundOn = false, unlocked = false, errMsg = "";
+var snd = document.getElementById("snd");
+
+function label() {
+  if (errMsg) { snd.textContent = errMsg; return; }
+  snd.textContent = soundOn ? "SUARA: ON" : (unlocked ? "SUARA: OFF" : "SUARA: OFF (klik di mana saja)");
+}
+
+function isMuted() { return AUDIO_SRC ? audio.muted : player.isMuted(); }
+function setMuted(m) {
+  if (AUDIO_SRC) { audio.muted = m; if (!m) { audio.volume = 1; audio.play().catch(function () {}); } }
+  else { if (m) player.mute(); else { player.unMute(); player.setVolume(100); player.playVideo(); } }
+  soundOn = !m; label();
+}
+function turnOn() { try { setMuted(false); } catch (err) {} }
+
+/* browser hanya mengizinkan suara setelah ada interaksi: klik/sentuh/tombol pertama langsung nyalakan suara */
+var evts = ["pointerdown", "touchstart", "keydown", "wheel"];
+function unlock() {
+  if (unlocked) return;
+  unlocked = true;
+  evts.forEach(function (n) { removeEventListener(n, unlock, true); });
+  if (ready) turnOn();
+}
+evts.forEach(function (n) { addEventListener(n, unlock, true); });
+
+snd.addEventListener("click", function (e) {
+  e.stopPropagation();
+  if (!ready) return;
+  unlocked = true;
+  setMuted(!isMuted());
+});
+
+if (AUDIO_SRC) {
+  /* ---- mode MP3 ---- */
+  audio = new Audio(AUDIO_SRC);
+  audio.loop = true; audio.preload = "auto";
+  audio.onerror = function () { errMsg = "MUSIK GAGAL: file " + AUDIO_SRC + " tidak ditemukan"; label(); };
+  ready = true;
+  audio.volume = 1; audio.muted = false;
+  audio.play().then(function () { soundOn = true; unlocked = true; label(); })
+    .catch(function () { audio.muted = true; audio.play().catch(function () {}); soundOn = false; label(); if (unlocked) turnOn(); });
+} else {
+  /* ---- mode YouTube ---- */
+  if (location.protocol === "file:") { errMsg = "MUSIK GAGAL: YouTube tidak jalan lewat file://. Upload ke hosting, atau pakai AUDIO_SRC (mp3)"; label(); }
+  var tag = document.createElement("script");
+  tag.src = "https://www.youtube.com/iframe_api";
+  tag.onerror = function () { errMsg = "MUSIK GAGAL: YouTube API tidak bisa dimuat (cek internet)"; label(); };
+  document.head.appendChild(tag);
+}
+
+function onYouTubeIframeAPIReady() {
+  var vars = { autoplay: 1, controls: 0, loop: 1, playlist: VIDEO_ID, playsinline: 1, rel: 0 };
+  if (location.protocol.indexOf("http") === 0) vars.origin = location.origin;
+  player = new YT.Player("yt", {
+    width: "220", height: "220", videoId: VIDEO_ID, playerVars: vars,
+    events: {
+      onReady: function (e) {
+        ready = true;
+        try { e.target.unMute(); e.target.setVolume(100); e.target.playVideo(); } catch (err) {}
+        /* kalau browser memblokir suara, putar muted dulu lalu nyalakan di interaksi pertama */
+        setTimeout(function () {
+          if (player.getPlayerState() === 1 && !player.isMuted()) { soundOn = true; unlocked = true; label(); return; }
+          player.mute(); player.playVideo(); soundOn = false; label();
+          if (unlocked) turnOn();
+        }, 1500);
+      },
+      onStateChange: function (e) { if (e.data === YT.PlayerState.ENDED) player.playVideo(); },
+      onError: function (e) {
+        var why = { 2: "ID video salah", 5: "error player HTML5", 100: "video dihapus/privat", 101: "pemilik melarang embed", 150: "pemilik melarang embed", 153: "embed ditolak (buka lewat http/https)" }[e.data] || "tidak diketahui";
+        errMsg = "MUSIK GAGAL (error " + e.data + ": " + why + ")"; label();
+      }
+    }
+  });
+}
 </script>
 </body>
 </html>
