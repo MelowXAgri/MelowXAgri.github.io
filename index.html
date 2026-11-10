@@ -2,65 +2,103 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
 <title>MelowXAgri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <style>
-  :root { --g: #f2f2f2; --g2: #9a9a9a; --bg: #000; }
+  :root { --w: #f2f2f2; --d: #8f8f8f; --red: #ff3b30; --bg: #000; --osd: "VT323", "Courier New", Courier, monospace; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; background: var(--bg); overflow: hidden; }
-  body { font-family: "Courier New", Courier, monospace; color: var(--g); }
+  body { font-family: var(--osd); font-size: 1.3rem; color: var(--w); -webkit-tap-highlight-color: transparent; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--w); outline-offset: 3px; }
 
-  #rain { position: fixed; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; filter: contrast(1.15) brightness(.9); animation: flick .12s infinite steps(2); }
-  @keyframes flick { 0% { opacity: .96; } 100% { opacity: 1; } }
+  /* ---------- lapisan layar ---------- */
+  #rain { position: fixed; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; filter: contrast(1.15) brightness(.85); }
+  body.tune #rain { filter: contrast(2.2) brightness(1.7); }
+  #vid { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; opacity: 0;
+         background: #000; filter: blur(5px) saturate(.15) contrast(1.5); transition: opacity .5s, filter 1.4s ease-out; }
+  #vid.on { opacity: 1; filter: none; }
 
-  #vid { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0; transition: opacity .7s; background: #000; }
-  #vid.on { opacity: 1; }
-
-  /* efek layar TV: garis scan, pita bergulir, vignette */
-  .scan { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,.28) 3px, rgba(0,0,0,0) 4px); }
-  .roll { position: fixed; left: 0; right: 0; top: -20%; height: 18%; z-index: 1; pointer-events: none; background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.12), rgba(255,255,255,0)); animation: roll 6s linear infinite; }
+  .scan { position: fixed; inset: 0; z-index: 3; pointer-events: none;
+          background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,.26) 3px, rgba(0,0,0,0) 4px); }
+  .vig { position: fixed; inset: 0; z-index: 3; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(0,0,0,.78) 100%); }
+  .roll { position: fixed; left: 0; right: 0; top: -20%; height: 18%; z-index: 3; pointer-events: none;
+          background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.1), rgba(255,255,255,0)); animation: roll 7s linear infinite; }
   @keyframes roll { to { transform: translateY(650%); } }
-  .vig { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(0,0,0,.75) 100%); }
 
-  /* judul di tengah */
-  .center { position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none; z-index: 2; text-align: center; padding: 1rem 1rem 14vh; }
-  h1 {
-    font-size: clamp(2.2rem, 10vw, 7rem);
-    letter-spacing: .08em; font-weight: 700; color: var(--g);
-    text-shadow: 0 0 6px rgba(255,255,255,.8), 0 0 24px rgba(255,255,255,.35);
-    background: rgba(0,0,0,.78); padding: .15em .45em; position: relative;
-  }
-  h1::before, h1::after { content: attr(data-t); position: absolute; inset: 0; padding: inherit; background: transparent; }
-  h1::before { color: #0ff; transform: translate(-2px,0); clip-path: inset(0 0 60% 0); animation: gl 3.2s infinite steps(1); mix-blend-mode: screen; text-shadow: none; }
-  h1::after  { color: #f0f; transform: translate(2px,0);  clip-path: inset(55% 0 0 0); animation: gl 2.7s infinite steps(1) reverse; mix-blend-mode: screen; text-shadow: none; }
+  /* pita tracking yang naik saat pindah saluran */
+  .track { position: fixed; left: 0; right: 0; bottom: -18%; height: 16%; z-index: 4; pointer-events: none; opacity: 0;
+           background: repeating-linear-gradient(to bottom, rgba(255,255,255,.55) 0, rgba(255,255,255,.55) 2px, rgba(255,255,255,.12) 3px, rgba(255,255,255,.3) 6px); }
+  body.tune .track { animation: trk 1s steps(10) forwards; }
+  @keyframes trk { 0% { opacity: .9; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-700%); } }
+
+  /* ---------- gerbang masuk ---------- */
+  #gate { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.8); display: grid; place-items: center;
+          text-align: center; cursor: pointer; padding: 1.5rem; transition: opacity .6s; }
+  #gate.out { opacity: 0; pointer-events: none; }
+  .box { display: grid; justify-items: center; gap: 1.4rem; }
+
+  h1 { position: relative; display: inline-block; white-space: nowrap; font-weight: 400; line-height: .95;
+       font-size: clamp(3.6rem, 17vw, 9.5rem); letter-spacing: .04em; padding: .08em .3em;
+       text-shadow: 0 0 6px rgba(255,255,255,.75), 0 0 28px rgba(255,255,255,.3); }
+  h1::before, h1::after { content: attr(data-t); position: absolute; inset: 0; padding: inherit; mix-blend-mode: screen; text-shadow: none; }
+  h1::before { color: #19e6ff; clip-path: inset(0 0 58% 0); animation: gl 3.4s infinite steps(1); }
+  h1::after  { color: #ff2bd6; clip-path: inset(54% 0 0 0); animation: gl 2.8s infinite steps(1) reverse; }
   @keyframes gl {
-    0%,88%,100% { transform: translate(0,0); opacity: 0; }
-    90% { transform: translate(-4px,1px); opacity: .9; }
-    93% { transform: translate(3px,-1px); opacity: .9; }
-    96% { transform: translate(-2px,0); opacity: .9; }
+    0%, 86%, 100% { transform: translate(0,0); opacity: 0; }
+    88% { transform: translate(-6px,1px); opacity: .95; }
+    92% { transform: translate(5px,-1px); opacity: .95; }
+    95% { transform: translate(-3px,0); opacity: .95; }
   }
 
-  /* tombol suara */
-  #snd {
-    position: fixed; right: 14px; bottom: 14px; z-index: 5; font: inherit; font-size: .85rem;
-    color: var(--g); background: rgba(0,0,0,.7); border: 1px solid var(--g2); padding: .5em .9em; cursor: pointer;
+  .log { list-style: none; text-align: left; color: var(--d); font-size: 1.25rem; min-height: 4.2em; }
+  .log li { opacity: 0; animation: show .01s forwards; }
+  .log li::before { content: "> "; }
+  .log li:nth-child(1) { animation-delay: .4s; }
+  .log li:nth-child(2) { animation-delay: 1.2s; }
+  .log li:nth-child(3) { animation-delay: 2s; color: var(--w); }
+  .log li:nth-child(3)::after { content: "_"; animation: blink 1s steps(1) infinite; }
+  @keyframes show { to { opacity: 1; } }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  #enter { position: relative; background: transparent; border: 1px solid var(--w); padding: .5em 1.6em;
+           font-size: clamp(1.7rem, 5vw, 2.2rem); letter-spacing: .22em; text-shadow: 0 0 8px rgba(255,255,255,.6);
+           box-shadow: 0 0 18px rgba(255,255,255,.16), inset 0 0 18px rgba(255,255,255,.05); animation: pulse 2.6s ease-in-out infinite; }
+  #enter:hover, #enter:focus-visible { background: var(--w); color: #000; text-shadow: none; animation: none; }
+  @keyframes pulse { 50% { box-shadow: 0 0 36px rgba(255,255,255,.42), inset 0 0 22px rgba(255,255,255,.12); } }
+  .hint { color: var(--d); font-size: 1.1rem; margin-top: -.6rem; }
+
+  /* ---------- OSD kamera (muncul setelah masuk) ---------- */
+  #hud { position: fixed; inset: 0; z-index: 6; pointer-events: none; opacity: 0; transition: opacity .6s .5s;
+         padding: max(14px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+         font-size: clamp(1.5rem, 3.2vw, 2rem); text-shadow: 0 0 6px rgba(0,0,0,.9), 1px 1px 0 rgba(0,0,0,.9), 0 0 10px rgba(255,255,255,.35); }
+  #hud.show { opacity: 1; }
+  #hud > * { position: absolute; }
+  .tl { top: max(14px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); display: grid; gap: .1em; }
+  .tr { top: max(14px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); text-align: right; }
+  .bl { bottom: max(14px, env(safe-area-inset-bottom)); left: max(16px, env(safe-area-inset-left)); letter-spacing: .1em; }
+  .br { bottom: max(14px, env(safe-area-inset-bottom)); right: max(16px, env(safe-area-inset-right)); display: flex; gap: .5rem; pointer-events: auto; }
+  .play { transition: opacity .6s; }
+  .play.off { opacity: 0; }
+  .rec { display: flex; align-items: center; gap: .4em; }
+  .rec i { width: .6em; height: .6em; border-radius: 50%; background: var(--red); box-shadow: 0 0 8px var(--red); animation: blink 1.2s steps(1) infinite; }
+  .ctl { background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.5); padding: .15em .7em; min-height: 40px; font-size: 1.25rem; text-shadow: none; }
+  .ctl:hover { background: var(--w); color: #000; border-color: var(--w); }
+
+  #err { position: fixed; z-index: 7; left: 50%; bottom: 18%; transform: translateX(-50%); width: min(92vw, 34rem); text-align: center;
+         background: rgba(0,0,0,.85); border: 1px solid var(--red); padding: .7em 1em; color: var(--w); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .roll, h1::before, h1::after, #enter, .rec i { animation: none; }
+    h1::before, h1::after { opacity: 0; }
+    .log li { animation-duration: .01s; animation-delay: 0s !important; }
+    body.tune .track { animation: none; }
+    #vid, #gate, #hud { transition-duration: .01s; transition-delay: 0s; }
   }
-  #snd:hover, #snd:focus-visible { border-color: var(--g); outline: none; box-shadow: 0 0 10px var(--g2); }
-
-
-  /* portal masuk */
-  #gate { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.84); display: grid; place-items: center; text-align: center; cursor: pointer; padding: 1rem; }
-  #gate button {
-    font: inherit; font-size: clamp(1.1rem, 3.4vw, 1.6rem); color: var(--g); background: transparent;
-    border: 1px solid var(--g); padding: .9em 1.8em; letter-spacing: .2em; cursor: pointer;
-    text-shadow: 0 0 8px rgba(255,255,255,.6); box-shadow: 0 0 18px rgba(255,255,255,.18), inset 0 0 18px rgba(255,255,255,.06);
-    animation: gp 2.4s ease-in-out infinite;
-  }
-  #gate button:hover, #gate button:focus-visible { background: var(--g); color: #000; text-shadow: none; outline: none; animation: none; }
-  #gate p { margin-top: 1rem; color: var(--g2); font-size: .85rem; letter-spacing: .08em; }
-  @keyframes gp { 50% { box-shadow: 0 0 34px rgba(255,255,255,.4), inset 0 0 22px rgba(255,255,255,.12); } }
-
-  @media (prefers-reduced-motion: reduce) { #rain, .roll { animation: none; } h1::before, h1::after { animation: none; opacity: 0; } #gate button { animation: none; } .cross { animation: none; opacity: 1; } .sigil.show { animation-duration: 0.01s; } }
 </style>
 </head>
 <body>
@@ -70,77 +108,138 @@
 <div class="scan"></div>
 <div class="roll"></div>
 <div class="vig"></div>
+<div class="track"></div>
 
-<button id="snd" hidden aria-label="Status musik"></button>
+<div id="hud" hidden>
+  <div class="tl">
+    <span class="play" id="play">&#9654; PLAY</span>
+    <span class="rec"><i></i>REC</span>
+  </div>
+  <div class="tr" id="clock"></div>
+  <div class="bl">MelowXAgri</div>
+  <div class="br">
+    <button class="ctl" id="snd" type="button" aria-pressed="true">suara nyala</button>
+    <button class="ctl" id="fs" type="button">layar penuh</button>
+  </div>
+</div>
+
+<div id="err" role="alert" hidden></div>
 
 <div id="gate">
-  <div>
-    <button id="enter">[ MASUK ]</button>
-    <p>klik untuk masuk</p>
+  <div class="box">
+    <h1 data-t="MelowXAgri">MelowXAgri</h1>
+    <ul class="log">
+      <li>mencari sinyal...</li>
+      <li>sinyal tidak ditemukan</li>
+      <li>siap diputar</li>
+    </ul>
+    <button id="enter" type="button">[ MASUK ]</button>
+    <p class="hint">klik di mana saja atau tekan Enter</p>
   </div>
 </div>
 
 <script>
-/* ---------- TV STATIC (tidak ada sinyal) ---------- */
 (function () {
-  var c = document.getElementById("rain"), x = c.getContext("2d");
-  var img, buf, w, h, SCALE = 3;
+  var $ = function (id) { return document.getElementById(id); };
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- TV static ---------- */
+  var c = $("rain"), x = c.getContext("2d"), img, buf, w, h, SCALE = 3, running = true, last = 0, tear = 0;
   function resize() {
     w = Math.ceil(innerWidth / SCALE); h = Math.ceil(innerHeight / SCALE);
     c.width = w; c.height = h;
     img = x.createImageData(w, h);
     buf = new Uint32Array(img.data.buffer);
+    if (reduce || !running) frame();
   }
-  resize(); addEventListener("resize", resize);
-
-  var last = 0, tear = 0;
-  function draw(t) {
-    requestAnimationFrame(draw);
-    if (t - last < 50) return; last = t;           /* ~20 fps, seperti noise TV */
+  function frame() {
     var n = buf.length, i, v;
-    for (i = 0; i < n; i++) {
-      v = (Math.random() * 255) | 0;
-      buf[i] = 0xFF000000 | (v << 16) | (v << 8) | v;
-    }
-    /* sesekali ada garis robek horizontal yang lebih terang */
+    for (i = 0; i < n; i++) { v = (Math.random() * 255) | 0; buf[i] = 0xFF000000 | (v << 16) | (v << 8) | v; }
     if (Math.random() < 0.15) tear = (Math.random() * h) | 0;
     if (tear) {
-      var rows = 2 + ((Math.random() * 4) | 0), start = tear * w, end = Math.min(n, start + rows * w);
-      for (i = start; i < end; i++) { v = 170 + ((Math.random() * 85) | 0); buf[i] = 0xFF000000 | (v << 16) | (v << 8) | v; }
+      var rows = 2 + ((Math.random() * 4) | 0), s = tear * w, e = Math.min(n, s + rows * w);
+      for (i = s; i < e; i++) { v = 170 + ((Math.random() * 85) | 0); buf[i] = 0xFF000000 | (v << 16) | (v << 8) | v; }
       if (Math.random() < 0.3) tear = 0;
     }
     x.putImageData(img, 0, 0);
   }
-  requestAnimationFrame(draw);
-})();
+  function loop(t) {
+    if (!running) return;
+    requestAnimationFrame(loop);
+    if (t - last < 50) return;
+    last = t; frame();
+  }
+  resize(); addEventListener("resize", resize);
+  if (reduce) { running = false; frame(); } else requestAnimationFrame(loop);
 
-/* ---------- VIDEO (mulai saat klik MASUK, dengan suara video) ---------- */
-var vid = document.getElementById("vid"), snd = document.getElementById("snd"), gate = document.getElementById("gate");
-var retryEvts = ["pointerdown", "touchend", "click", "keydown"];
-function showErr(m) { snd.hidden = false; snd.textContent = m; }
-function play() {
-  var p = vid.play();
-  if (p && p.catch) p.catch(function () {
-    /* kalau diblokir browser, coba lagi di interaksi berikutnya */
-    retryEvts.forEach(function (n) { addEventListener(n, retry, true); });
+  /* ---------- elemen & status ---------- */
+  var vid = $("vid"), gate = $("gate"), hud = $("hud"), snd = $("snd"), fs = $("fs"), err = $("err"), entered = false;
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function tick() {
+    var d = new Date();
+    $("clock").textContent = pad(d.getDate()) + "." + pad(d.getMonth() + 1) + "." + d.getFullYear() + "  " +
+      pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+  }
+  function setSnd() {
+    snd.textContent = vid.muted ? "suara mati" : "suara nyala";
+    snd.setAttribute("aria-pressed", String(!vid.muted));
+  }
+  function play() {
+    var p = vid.play();
+    if (p && p.catch) p.catch(function () {
+      /* browser menolak suara: jalan dulu tanpa suara, tombol suara untuk menyalakan */
+      vid.muted = true; setSnd();
+      vid.play().catch(function () {});
+    });
+  }
+  function toggleSnd() { vid.muted = !vid.muted; if (!vid.muted) vid.volume = 1; setSnd(); if (vid.paused) play(); }
+  function toggleFs() {
+    var d = document, el = d.documentElement;
+    if (d.fullscreenElement) d.exitFullscreen(); else if (el.requestFullscreen) el.requestFullscreen();
+  }
+  if (!document.documentElement.requestFullscreen) fs.hidden = true;
+  snd.addEventListener("click", toggleSnd);
+  fs.addEventListener("click", toggleFs);
+
+  vid.addEventListener("error", function () {
+    err.hidden = false;
+    err.textContent = "Video tidak bisa dimuat. Pastikan file video.mp4 ada di folder yang sama dengan index.html.";
+    document.body.classList.remove("tune");
   });
-}
-function retry() {
-  retryEvts.forEach(function (n) { removeEventListener(n, retry, true); });
-  play();
-}
-vid.addEventListener("error", function () { showErr("VIDEO GAGAL: file tidak bisa diputar"); });
 
-/* klik MASUK = interaksi sah, jadi browser mengizinkan video + suara langsung jalan */
-function enter() {
-  gate.removeEventListener("click", enter);
-  gate.style.transition = "opacity .7s"; gate.style.opacity = 0;
-  setTimeout(function () { gate.remove(); }, 750);
-  vid.volume = 1; vid.muted = false;
-  vid.classList.add("on");
-  play();
-}
-gate.addEventListener("click", enter);
+  /* ---------- masuk: pindah saluran dari static ke video ---------- */
+  var shown = false;
+  function reveal() {
+    if (shown) return; shown = true;
+    vid.classList.add("on");
+    setTimeout(function () { running = false; c.style.visibility = "hidden"; }, 1500); /* hemat CPU */
+    setTimeout(function () { $("play").classList.add("off"); }, 4200);
+  }
+  vid.addEventListener("playing", reveal);
+
+  function enter() {
+    if (entered) return; entered = true;
+    gate.removeEventListener("click", enter);
+    document.body.classList.add("tune");
+    gate.classList.add("out");
+    setTimeout(function () { gate.remove(); document.body.classList.remove("tune"); }, 900);
+    hud.hidden = false;
+    requestAnimationFrame(function () { hud.classList.add("show"); });
+    tick(); setInterval(tick, 1000);
+    vid.muted = false; vid.volume = 1; setSnd();
+    play();
+    setTimeout(function () { if (!err.hidden) return; reveal(); }, 2500); /* jaga-jaga jika event playing telat */
+  }
+  gate.addEventListener("click", enter);
+  $("enter").focus({ preventScroll: true });
+
+  addEventListener("keydown", function (e) {
+    if (!entered) return;
+    var k = e.key.toLowerCase();
+    if (k === "m") toggleSnd(); else if (k === "f") toggleFs();
+  });
+})();
 </script>
 </body>
 </html>
