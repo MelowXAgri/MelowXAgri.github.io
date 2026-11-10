@@ -89,6 +89,14 @@
   .ctl { background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.5); padding: .15em .7em; min-height: 40px; font-size: 1.25rem; text-shadow: none; }
   .ctl:hover { background: var(--w); color: #000; border-color: var(--w); }
 
+  .find { left: 50%; transform: translateX(-50%); width: min(92vw, 32rem); display: flex; gap: .5rem; pointer-events: auto;
+          bottom: calc(max(14px, env(safe-area-inset-bottom)) + 3.4rem); }
+  .find input { flex: 1; min-width: 0; min-height: 44px; padding: 0 .8em; font: inherit; font-size: 1.4rem; color: var(--w);
+                background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.5); border-radius: 0; text-shadow: none; }
+  .find input::placeholder { color: var(--d); }
+  .find input:focus-visible { outline: 2px solid var(--w); outline-offset: 2px; background: rgba(0,0,0,.8); }
+  .find .ctl { padding: 0 1.1em; }
+
   #err { position: fixed; z-index: 7; left: 50%; bottom: 18%; transform: translateX(-50%); width: min(92vw, 34rem); text-align: center;
          background: rgba(0,0,0,.85); border: 1px solid var(--red); padding: .7em 1em; color: var(--w); }
 
@@ -117,6 +125,10 @@
   </div>
   <div class="tr" id="clock"></div>
   <div class="bl">MelowXAgri</div>
+  <form class="find" id="find" role="search">
+    <input id="q" type="search" placeholder="cari lagu di YouTube" aria-label="Cari lagu di YouTube" autocomplete="off" enterkeyhint="search">
+    <button class="ctl" type="submit">cari</button>
+  </form>
   <div class="br">
     <button class="ctl" id="snd" type="button" aria-pressed="true">suara nyala</button>
     <button class="ctl" id="fs" type="button">layar penuh</button>
@@ -234,8 +246,15 @@
   gate.addEventListener("click", enter);
   $("enter").focus({ preventScroll: true });
 
+  $("find").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var q = $("q").value.trim();
+    if (!q) { $("q").focus(); return; }
+    window.open("https://www.youtube.com/results?search_query=" + encodeURIComponent(q), "_blank", "noopener");
+  });
+
   addEventListener("keydown", function (e) {
-    if (!entered) return;
+    if (!entered || /^(input|textarea)$/i.test(e.target.tagName)) return;
     var k = e.key.toLowerCase();
     if (k === "m") toggleSnd(); else if (k === "f") toggleFs();
   });
