@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AnLyrics Bot: Video Lirik, Karaoke &amp; Shorts dari Satu Judul Lagu</title>
+<meta name="description" content="Script bot Telegram yang mengubah judul lagu jadi video lirik 16:9, karaoke tanpa vokal, Shorts 9:16, dan langsung upload ke YouTube. Hubungi admin via WhatsApp 0822-2111-2027.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@400;500;600;700&family=Silkscreen:wght@400;700&family=Exo+2:ital,wght@1,800;1,900&family=Poppins:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --malam:#050208;      /* hitam channel */
+  --ungu:#1b0a33;
+  --lembayung:#7b1fd1;
+  --jingga:#b94dff;     /* ungu neon (aksen utama, seperti petir di banner) */
+  --perak:#e9e6f2;
+  --krem:#f4f0fb;
+  --kabut:#a99bc4;
+  --hijau:#2fbf71;      /* tombol hijau di bot */
+  --biru:#3d7bff;       /* tombol biru di bot */
+  --merah:#e24c5a;
+  --ukuran: 1.0625rem;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--malam);color:var(--krem);font:400 var(--ukuran)/1.6 "Plus Jakarta Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.tautan{color:var(--jingga);text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.tautan:hover{color:#ffb08a}
+:focus-visible{outline:3px solid var(--jingga);outline-offset:3px;border-radius:6px}
+.wrap{width:min(1120px,100% - 2.5rem);margin-inline:auto}
+h1,h2,h3{font-family:Poppins,"Plus Jakarta Sans",sans-serif;line-height:1.15;margin:0;font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(1.8rem,1.2rem + 2.4vw,2.75rem);max-width:22ch}
+h3{font-size:1.15rem;font-weight:600}
+p{margin:0}
+.lead{color:var(--kabut);max-width:60ch;margin-top:1rem}
+
+/* ---------- navigasi ---------- */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0}
+.brand{display:flex;align-items:center;gap:.6rem;font:600 1rem Poppins,sans-serif;text-decoration:none}
+.brand i{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 50% 50%,var(--malam) 0 22%,var(--jingga) 23% 60%,transparent 61%),var(--ungu);display:block}
+.nav ul{display:flex;gap:1.5rem;list-style:none;margin:0;padding:0;font-size:.95rem;color:var(--kabut)}
+.nav ul a{text-decoration:none}.nav ul a:hover{color:var(--krem)}
+.wa-pendek{display:none}
+.tombol-menu{display:none}
+@media (max-width:760px){
+  .nav{position:sticky;top:0;z-index:20;background:rgba(5,2,8,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+       margin:0;width:100%;padding:.8rem 1.25rem;border-bottom:1px solid rgba(185,77,255,.2);gap:.6rem}
+  .nav .brand{margin-right:auto}
+  .nav .btn{padding:.55rem .95rem;font-size:.9rem}
+  .wa-panjang{display:none}.wa-pendek{display:inline}
+  .tombol-menu{display:grid;gap:5px;place-content:center;width:44px;height:44px;border-radius:12px;cursor:pointer;
+       background:#0d0618;border:1.5px solid rgba(185,77,255,.45)}
+  .tombol-menu span{display:block;width:20px;height:2px;border-radius:2px;background:var(--krem);transition:transform .2s,opacity .2s}
+  .tombol-menu[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .tombol-menu[aria-expanded="true"] span:nth-child(2){opacity:0}
+  .tombol-menu[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .nav ul{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;gap:0;padding:.4rem 1.25rem 1rem;
+       background:#07030d;border-bottom:1px solid rgba(185,77,255,.3);box-shadow:0 20px 40px -10px rgba(0,0,0,.8)}
+  .nav ul.buka{display:flex}
+  .nav ul a{display:block;padding:.85rem .2rem;font-size:1.05rem;color:var(--krem);border-bottom:1px solid rgba(185,77,255,.12)}
+  .nav ul li:last-child a{border-bottom:0}
+}
+@media (max-width:760px) and (prefers-reduced-motion: reduce){.tombol-menu span{transition:none}}
+
+.btn{display:inline-flex;align-items:center;gap:.55rem;padding:.85rem 1.35rem;border-radius:999px;font:600 1rem "Plus Jakarta Sans",sans-serif;text-decoration:none;border:0;cursor:pointer}
+.btn-utama{background:var(--jingga);color:#2a1206}
+.btn-utama:hover{background:#ff8f5c}
+.btn-garis{border:1.5px solid rgba(251,244,255,.35);color:var(--krem)}
+.btn-garis:hover{border-color:var(--krem)}
+.btn svg{width:20px;height:20px}
+
+/* ---------- hero: tampilan video lirik asli bot ---------- */
+.hero{padding:2.5rem 0 5rem}
+.hero h1{font-size:clamp(2.3rem,1.4rem + 3.6vw,4.1rem);max-width:15ch}
+.hero .lead{font-size:1.15rem}
+.hero .aksi{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:2rem}
+.hero-grid{display:grid;grid-template-columns:1fr;gap:3rem;align-items:center}
+@media (min-width:980px){.hero-grid{grid-template-columns:.9fr 1.1fr}}
+
+.layar{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:
+  radial-gradient(120% 90% at 30% 20%,#5a2e84 0,transparent 60%),
+  radial-gradient(90% 80% at 85% 90%,#7a2f52 0,transparent 55%),
+  linear-gradient(160deg,#2b1648,#160b26);box-shadow:0 30px 80px -30px rgba(255,122,61,.35),0 0 0 1px rgba(255,255,255,.06)}
+.layar .isi{position:absolute;inset:7% 5% 12%;display:grid;grid-template-columns:34% 1fr;gap:5%;align-items:center}
+.sampul{aspect-ratio:1;border-radius:9%;background:
+  radial-gradient(circle at 50% 50%,#24123d 0 13%,var(--jingga) 13.5% 36%,transparent 36.5%),
+  linear-gradient(180deg,#2e2580,#a2213d);box-shadow:0 14px 30px rgba(0,0,0,.45);position:relative}
+.cap{position:absolute;left:50%;bottom:-17%;transform:translateX(-50%);white-space:nowrap;font:600 clamp(.4rem,.75vw,.66rem) Poppins,sans-serif;padding:.35em .9em;border-radius:99px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.18)}
+.cap::before{content:"";display:inline-block;width:.5em;height:.5em;border-radius:50%;background:var(--jingga);margin-right:.5em;vertical-align:.1em}
+.teks{font-family:Poppins,sans-serif;min-width:0}
+.tag{display:inline-block;font-size:clamp(.4rem,.7vw,.62rem);font-weight:700;background:var(--jingga);color:#2a1206;padding:.15em .7em;border-radius:99px}
+.judul{font-size:clamp(.75rem,1.45vw,1.3rem);font-weight:700;margin-top:.35em}
+.artis{font-size:clamp(.5rem,.85vw,.78rem);color:var(--kabut);padding-bottom:.6em;border-bottom:1px solid rgba(255,255,255,.4)}
+.baris-lain{font-size:clamp(.5rem,1vw,.9rem);color:rgba(251,244,255,.75);margin:.7em 0}
+.baris-kini{font-size:clamp(.9rem,2vw,1.8rem);font-weight:700;line-height:1.2;min-height:2.4em}
+.kata{background:linear-gradient(90deg,var(--jingga) 50%,var(--krem) 50%);background-size:200% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;color:transparent}
+.kata.nyala{animation:sapu var(--d,.45s) linear forwards}
+@keyframes sapu{to{background-position:0 0}}
+.kemajuan{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.75)}
+.kemajuan b{display:block;height:100%;width:0;background:var(--jingga)}
+.durasi{position:absolute;right:2%;bottom:8px;font-size:clamp(.4rem,.7vw,.6rem);color:var(--kabut);font-family:Poppins,sans-serif}
+@media (prefers-reduced-motion: reduce){.kata{background:none;color:var(--krem)}.kata.nyala{animation:none;color:var(--jingga)}}
+
+/* ---------- bagian umum ---------- */
+section{padding:5.5rem 0;border-top:1px solid rgba(201,184,224,.12)}
+
+/* ---------- hasil yang dibuat ---------- */
+.hasil{display:grid;gap:2.5rem;margin-top:3rem}
+@media (min-width:900px){.hasil{grid-template-columns:1.35fr .65fr}}
+.karya{display:grid;gap:1rem}
+.karya figure{margin:0}
+.karya figcaption{margin-top:.9rem}
+.karya figcaption h3{margin-bottom:.3rem}
+.karya figcaption p{color:var(--kabut);font-size:.98rem}
+.mini{aspect-ratio:16/9;border-radius:12px;position:relative;overflow:hidden;background:linear-gradient(160deg,#2b1648,#160b26)}
+.mini .isi{position:absolute;inset:12% 6%;display:grid;grid-template-columns:30% 1fr;gap:6%;align-items:center}
+.mini .baris-kini{font-size:clamp(.8rem,1.6vw,1.25rem);min-height:auto}
+.karaoke-bg{background:radial-gradient(90% 80% at 80% 20%,#6b2a2a,transparent 60%),linear-gradient(160deg,#2a1a3c,#120a1e)}
+.dua{display:grid;gap:1.5rem}
+@media (min-width:640px){.dua{grid-template-columns:1fr 1fr}}
+.hp{width:min(260px,70%);margin-inline:auto;aspect-ratio:9/16;border-radius:26px;padding:7% 7% 9%;background:linear-gradient(170deg,#3a1d5e,#160b26 70%);border:6px solid #2a2338;display:flex;flex-direction:column;justify-content:center;gap:6%;font-family:Poppins,sans-serif;text-align:center;position:relative}
+.hp .sampul{width:62%;margin:0 auto}
+.hp .judul{font-size:.95rem}
+.hp .baris-kini{font-size:1.05rem;min-height:auto}
+.hp small{position:absolute;top:4%;left:0;right:0;color:var(--kabut);font-size:.7rem}
+.audio{margin-top:1.5rem;display:flex;gap:1rem;align-items:center;padding:1rem;border-radius:14px;background:#24153b;border:1px solid rgba(201,184,224,.15)}
+.audio .sampul{width:64px;flex:none}
+.gelombang{display:flex;gap:3px;align-items:center;height:28px;margin-top:.4rem}
+.gelombang i{width:3px;border-radius:2px;background:var(--kabut);opacity:.7}
+
+/* ---------- cara kerja (memang berurutan) ---------- */
+.langkah{list-style:none;margin:3rem 0 0;padding:0;display:grid;gap:0;counter-reset:l}
+.langkah li{display:grid;grid-template-columns:3.2rem 1fr;gap:1.2rem;padding:1.4rem 0;border-bottom:1px solid rgba(201,184,224,.12);counter-increment:l}
+.langkah li::before{content:counter(l);font:700 1.6rem Poppins,sans-serif;color:var(--jingga);line-height:1.2}
+.langkah h3{margin-bottom:.35rem}
+.langkah p{color:var(--kabut);max-width:62ch}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:rgba(255,122,61,.14);color:#ffd2bd;padding:.1em .4em;border-radius:5px}
+
+/* ---------- percakapan telegram ---------- */
+.obrolan-grid{display:grid;gap:3rem;align-items:start;margin-top:3rem}
+@media (min-width:900px){.obrolan-grid{grid-template-columns:1fr 1fr}}
+.tg{background:#0e1621;border-radius:18px;padding:1.2rem;font-size:.92rem;border:1px solid #1d2a3a}
+.tg .pesan{max-width:88%;padding:.6rem .85rem;border-radius:12px;margin:.5rem 0;line-height:1.45}
+.tg .saya{margin-left:auto;background:#2b5278;border-bottom-right-radius:4px}
+.tg .bot{background:#182533;border-bottom-left-radius:4px}
+.tg .bot b{font-family:Poppins,sans-serif}
+.tg .daftar{margin:.4rem 0 0;padding-left:1.1rem;color:#d7e2ee}
+.tg .daftar em{color:#8fa3b8;font-style:normal}
+.tombol{display:grid;gap:4px;margin-top:4px;max-width:88%}
+.tombol div{display:grid;gap:4px;grid-auto-flow:column;grid-auto-columns:1fr}
+.tombol span{text-align:center;padding:.5rem .4rem;border-radius:9px;font-size:.82rem;font-weight:600;background:#22364a}
+.tombol .b{background:var(--biru)}.tombol .g{background:var(--hijau)}.tombol .r{background:var(--merah)}
+.perintah{display:grid;grid-template-columns:auto 1fr;gap:.55rem 1.2rem;margin:0}
+.perintah dt{white-space:nowrap}
+.perintah dd{margin:0;color:var(--kabut)}
+.perintah .grup{grid-column:1/-1;font:600 1rem Poppins,sans-serif;color:var(--krem);margin-top:1.2rem}
+.perintah .grup:first-child{margin-top:0}
+
+/* ---------- daftar fitur ---------- */
+.fitur{display:grid;gap:3rem 4rem;margin-top:3rem}
+@media (min-width:860px){.fitur{grid-template-columns:1fr 1fr}}
+.fitur h3{font-size:1.3rem;padding-bottom:.7rem;border-bottom:2px solid var(--jingga);margin-bottom:1rem}
+.fitur ul{margin:0;padding:0;list-style:none;display:grid;gap:.85rem}
+.fitur li{padding-left:1.4rem;position:relative;color:var(--kabut)}
+.fitur li::before{content:"";position:absolute;left:0;top:.62em;width:.5rem;height:.5rem;border-radius:50%;background:var(--jingga)}
+.fitur li strong{color:var(--krem);font-weight:600}
+
+/* ---------- kebutuhan ---------- */
+.butuh{display:grid;gap:1.5rem;margin-top:2.5rem}
+@media (min-width:760px){.butuh{grid-template-columns:repeat(3,1fr)}}
+.butuh div{padding-top:1rem;border-top:1px solid rgba(201,184,224,.25)}
+.butuh p{color:var(--kabut);margin-top:.4rem;font-size:.98rem}
+
+/* ---------- tanya jawab ---------- */
+.tj{margin-top:2.5rem;max-width:780px}
+.tj details{border-bottom:1px solid rgba(201,184,224,.15);padding:1.1rem 0}
+.tj summary{cursor:pointer;font:600 1.08rem Poppins,sans-serif;list-style:none;display:flex;justify-content:space-between;gap:1rem}
+.tj summary::-webkit-details-marker{display:none}
+.tj summary::after{content:"+";color:var(--jingga);font-size:1.4rem;line-height:1}
+.tj details[open] summary::after{content:"–"}
+.tj details p{color:var(--kabut);margin-top:.7rem;max-width:68ch}
+
+/* ---------- penutup ---------- */
+.akhir{text-align:center;padding:6rem 0 5rem;background:radial-gradient(60% 80% at 50% 100%,rgba(255,122,61,.18),transparent 70%)}
+.akhir h2{margin-inline:auto;max-width:18ch}
+.akhir .lead{margin-inline:auto}
+.akhir .aksi{display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center;margin-top:2rem}
+footer{padding:2rem 0 3rem;color:var(--kabut);font-size:.9rem;border-top:1px solid rgba(201,184,224,.12)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;text-align:center}
+
+/* ---------- gaya channel AnLyrics: hitam + ungu neon + petir + judul perak ---------- */
+body{background:var(--malam)}
+.hero-bg{position:relative;overflow:hidden;background:
+  radial-gradient(60% 70% at 15% 30%,rgba(123,31,209,.45),transparent 65%),
+  radial-gradient(55% 70% at 90% 60%,rgba(185,77,255,.30),transparent 65%),#050208}
+.petir{position:absolute;inset:0;width:100%;height:100%;opacity:.6;pointer-events:none;
+  -webkit-mask-image:linear-gradient(90deg,#000 0 7%,transparent 12% 46%,#000 58%);mask-image:linear-gradient(90deg,#000 0 7%,transparent 12% 46%,#000 58%)}
+@media (max-width:979px){.petir{-webkit-mask-image:linear-gradient(180deg,transparent 0 45%,#000 70%);mask-image:linear-gradient(180deg,transparent 0 45%,#000 70%)}}
+.hero{position:relative}
+h1,h2{font-family:"Exo 2",Poppins,sans-serif;font-style:italic;font-weight:900;letter-spacing:-.005em;
+  background:linear-gradient(180deg,#ffffff 0%,#e3dff0 45%,#9d97b0 55%,#f1eef8 100%);
+  background-size:100% 1.15em;background-repeat:repeat-y; /* kilau perak berulang tiap baris */
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 12px rgba(185,77,255,.4))}
+h1{line-height:1.05;background-size:100% 1.05em}
+.brand{font:900 italic 1.25rem "Exo 2",sans-serif;color:var(--perak);text-shadow:0 0 12px rgba(185,77,255,.8)}
+.brand i{background:radial-gradient(circle at 50% 50%,#050208 0 22%,var(--jingga) 23% 60%,transparent 61%),#2a0d4d;box-shadow:0 0 14px rgba(185,77,255,.9)}
+.btn-utama{background:linear-gradient(135deg,#8a2be2,#c45cff);color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 8px 30px -6px rgba(185,77,255,.8)}
+.btn-utama:hover{background:linear-gradient(135deg,#9b3cf3,#d47bff)}
+.btn-garis{border-color:rgba(185,77,255,.55)}
+.btn-garis:hover{border-color:var(--jingga);box-shadow:0 0 18px -4px rgba(185,77,255,.8)}
+section{border-top:1px solid rgba(185,77,255,.18)}
+.layar{background:radial-gradient(120% 90% at 30% 20%,#4a1a86 0,transparent 60%),radial-gradient(90% 80% at 85% 90%,#2c0a52 0,transparent 55%),linear-gradient(160deg,#160828,#050208);
+  box-shadow:0 0 0 1px rgba(185,77,255,.45),0 0 60px -10px rgba(185,77,255,.6),0 40px 80px -30px #000}
+.sampul{background:radial-gradient(circle at 50% 50%,#0b0414 0 13%,var(--jingga) 13.5% 36%,transparent 36.5%),linear-gradient(180deg,#2a0d4d,#0b0414);box-shadow:0 0 24px rgba(185,77,255,.45)}
+.tag{background:var(--jingga);color:#fff}
+.kata{background-image:linear-gradient(90deg,#d58cff 50%,var(--krem) 50%)}
+.kemajuan b{background:linear-gradient(90deg,#7b1fd1,#d58cff);box-shadow:0 0 10px #b94dff}
+.mini{background:linear-gradient(160deg,#170a2b,#050208);box-shadow:0 0 0 1px rgba(185,77,255,.3)}
+.karaoke-bg{background:radial-gradient(90% 80% at 80% 20%,#3d1270,transparent 60%),linear-gradient(160deg,#120722,#050208)}
+.hp{background:linear-gradient(170deg,#2a0d4d,#050208 70%);border-color:#1d1230;box-shadow:0 0 40px -8px rgba(185,77,255,.6)}
+.audio{background:#0d0618;border-color:rgba(185,77,255,.3)}
+.langkah li{border-bottom-color:rgba(185,77,255,.18)}
+.langkah li::before{font-family:"Exo 2",sans-serif;font-style:italic;font-weight:900;font-size:2rem;color:var(--jingga);text-shadow:0 0 14px rgba(185,77,255,.7)}
+code{background:rgba(185,77,255,.15);color:#e2b8ff}
+.fitur h3{border-bottom-color:var(--jingga);box-shadow:0 6px 12px -10px rgba(185,77,255,.9)}
+.fitur li::before{box-shadow:0 0 8px var(--jingga)}
+.butuh div{border-top-color:rgba(185,77,255,.35)}
+.tj details{border-bottom-color:rgba(185,77,255,.2)}
+.tg{box-shadow:0 0 0 1px rgba(185,77,255,.25)}
+.akhir{background:radial-gradient(60% 80% at 50% 100%,rgba(185,77,255,.28),transparent 70%)}
+.tautan{color:#d58cff}.tautan:hover{color:#ecc6ff}
+:focus-visible{outline-color:#d58cff}
+footer{border-top-color:rgba(185,77,255,.18)}
+.paket{display:grid;gap:1.5rem;margin-top:2.5rem}
+@media (min-width:980px){.paket{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:640px) and (max-width:979px){.paket{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kartu-harga{padding:2rem;border-radius:20px;background:#0b0514;box-shadow:0 0 0 1px rgba(185,77,255,.25);display:flex;flex-direction:column;gap:1rem}
+.kartu-harga.unggulan{background:radial-gradient(90% 90% at 100% 0%,rgba(123,31,209,.4),transparent 60%),#0d0618;box-shadow:0 0 0 1.5px var(--jingga),0 0 50px -12px rgba(185,77,255,.8)}
+.kartu-harga h3{font-size:1.3rem}
+.nominal{font-family:"Exo 2",Poppins,sans-serif;font-style:italic;font-weight:900;font-size:clamp(1.9rem,1.4rem + 1.4vw,2.5rem);line-height:1;white-space:nowrap;color:var(--perak);text-shadow:0 0 18px rgba(185,77,255,.6)}
+.kartu-harga ul{margin:0;padding:0;list-style:none;display:grid;gap:.6rem;align-content:start;color:var(--kabut);flex:1}
+.kartu-harga li{padding-left:1.4rem;position:relative}
+.kartu-harga li::before{content:"";position:absolute;left:0;top:.62em;width:.5rem;height:.5rem;border-radius:50%;background:var(--jingga);box-shadow:0 0 8px var(--jingga)}
+.kartu-harga .btn{align-self:flex-start}
+
+/* ---------- demo proses ---------- */
+[hidden]{display:none!important}
+.tab{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:2rem}
+.tab button{font:600 .95rem "Plus Jakarta Sans",sans-serif;color:var(--krem);background:#0d0618;border:1.5px solid rgba(185,77,255,.35);padding:.6rem 1.1rem;border-radius:999px;cursor:pointer}
+.tab button[aria-selected="true"]{background:linear-gradient(135deg,#8a2be2,#c45cff);border-color:transparent;box-shadow:0 0 22px -6px rgba(185,77,255,.9)}
+.tab .ulang{margin-left:auto;background:transparent}
+.demo{display:grid;gap:2rem;margin-top:1.6rem;align-items:start}
+@media (min-width:980px){.demo{grid-template-columns:.85fr 1.15fr}}
+.demo-tg{min-height:430px}
+.demo-tombol span{transition:transform .15s,box-shadow .15s}
+.demo-tombol span.tekan{transform:scale(.94);box-shadow:0 0 0 3px #fff inset}
+.status .status-judul{display:block;font-size:1rem;margin-bottom:.35rem}
+.status-isi div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status-isi .baru{animation:muncul .3s ease-out}
+@keyframes muncul{from{opacity:0;transform:translateY(4px)}}
+.kirim{border:1px solid rgba(185,77,255,.5)}
+.demo-video .kosong{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:.8rem;color:var(--kabut);font-size:.95rem}
+.putar{width:64px;height:64px;border-radius:50%;border:2px solid rgba(185,77,255,.6);position:relative}
+.putar::after{content:"";position:absolute;left:26px;top:20px;border-left:18px solid #d58cff;border-top:12px solid transparent;border-bottom:12px solid transparent}
+.demo-video .kosong.sibuk .putar{border-color:transparent;border-top-color:#d58cff;border-right-color:#d58cff;animation:putar 1s linear infinite}
+.demo-video .kosong.sibuk .putar::after{display:none}
+@keyframes putar{to{transform:rotate(360deg)}}
+.vokal{position:absolute;left:5%;bottom:9%;display:flex;align-items:center;gap:.5rem;font:600 .7rem Poppins,sans-serif;color:var(--kabut)}
+.bar-vokal{width:90px;height:6px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+.bar-vokal i{display:block;height:100%;width:100%;background:#d58cff;transition:width 1.2s ease}
+.demo-ket{margin-top:.7rem;font-size:.85rem;color:var(--kabut)}
+.d-kini .kata-l{color:var(--krem)}
+@media (prefers-reduced-motion: reduce){.demo-video .kosong.sibuk .putar{animation:none}}
+.hero h1{font-size:clamp(2.1rem,1.3rem + 3vw,3.5rem);max-width:17ch}
+.tagline{margin-top:1rem;font:700 clamp(1.15rem,1rem + .6vw,1.45rem)/1.35 Poppins,sans-serif;color:#d58cff;text-shadow:0 0 16px rgba(185,77,255,.55)}
+.nominal small{font-size:.45em;font-weight:800;margin-left:.2em;color:var(--kabut);text-shadow:none}
+.dua-audio{display:grid;gap:1rem;margin-top:1.5rem}
+@media (min-width:640px){.dua-audio{grid-template-columns:1fr 1fr}}
+.dua-audio .audio{margin-top:0;align-items:flex-start}
+.dua-audio h3{font-size:1.05rem}
+.dua-audio p{color:var(--kabut);font-size:.93rem;margin-top:.4rem}
+.gelombang.datar i{background:#d58cff;opacity:.55}
+
+/* ================= TEMA PIXEL (gaya game blok) ================= */
+:root{--px:4px;--bayang:#000;--tepi:#2a1648;--tepi-terang:#4b2a7d;--blok:#140a24;--blok2:#1d0f33}
+body{font-family:"Pixelify Sans",system-ui,sans-serif;font-size:1.12rem;line-height:1.55;
+  background:var(--malam);
+  background-image:linear-gradient(rgba(185,77,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(185,77,255,.045) 1px,transparent 1px);
+  background-size:24px 24px;-webkit-font-smoothing:none}
+h1,h2,.nominal,.brand,.langkah li::before{font-family:"Press Start 2P",monospace!important;font-style:normal!important;font-weight:400!important;
+  background:none!important;-webkit-background-clip:border-box;background-clip:border-box;color:var(--perak)!important;filter:none!important;
+  text-shadow:var(--px) var(--px) 0 #4a1a86,0 0 18px rgba(185,77,255,.35)}
+h1{line-height:1.4!important;letter-spacing:0}
+.hero h1{font-size:clamp(1.25rem,.8rem + 2.2vw,2.35rem);max-width:20ch}
+h2{font-size:clamp(1.1rem,.8rem + 1.5vw,1.85rem);line-height:1.45;max-width:24ch}
+h3,.tj summary,.perintah .grup,.status .status-judul{font-family:"Silkscreen",monospace!important;font-weight:700!important;letter-spacing:.01em;color:#e3c2ff}
+.tagline{font-family:"Pixelify Sans",sans-serif;font-weight:700;color:#e3b0ff;text-shadow:3px 3px 0 #2a0d4d}
+.brand{font-size:1rem!important;color:#f3e45a!important;text-shadow:3px 3px 0 #4a1a86!important}
+.brand i{border-radius:0!important;image-rendering:pixelated;box-shadow:0 0 0 3px #000,0 0 0 6px var(--jingga)!important}
+/* semua sudut jadi kotak */
+.btn,.tab button,.kartu-harga,.tg,.tombol span,.mini,.hp,.audio,.layar,.sampul,.tag,.cap,code,.kirim,.putar,.bar-vokal,.kemajuan,.kemajuan b,.tj details,.butuh div,.karya figure,.demo-video,.nav ul,.tombol-menu{border-radius:0!important}
+/* tombol bevel 3D */
+.btn{font-family:"Silkscreen",monospace!important;font-weight:700;font-size:.95rem;letter-spacing:.02em;padding:.85rem 1.2rem;
+  border:3px solid #000!important;box-shadow:inset -4px -4px 0 rgba(0,0,0,.45),inset 4px 4px 0 rgba(255,255,255,.22),var(--px) var(--px) 0 #000!important;
+  transition:transform .06s steps(1),box-shadow .06s steps(1)}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:inset -4px -4px 0 rgba(0,0,0,.45),inset 4px 4px 0 rgba(255,255,255,.22),6px 6px 0 #000!important}
+.btn:active{transform:translate(var(--px),var(--px));box-shadow:inset 4px 4px 0 rgba(0,0,0,.45)!important}
+.btn-utama,.btn-utama:hover{background:#8a2be2!important;color:#fff}
+.btn-garis,.btn-garis:hover{background:#2a2140!important;color:#e9e6f2}
+.tab button{font-family:"Silkscreen",monospace;font-weight:700;background:#1a1129;border:3px solid #000;box-shadow:inset -3px -3px 0 rgba(0,0,0,.5),inset 3px 3px 0 rgba(255,255,255,.12)}
+.tab button[aria-selected="true"]{background:#8a2be2!important;border-color:#000!important;box-shadow:inset -3px -3px 0 rgba(0,0,0,.45),inset 3px 3px 0 rgba(255,255,255,.25),4px 4px 0 #000!important}
+/* panel blok: tepi tebal + bayangan keras */
+.kartu-harga,.tg,.audio,.butuh div,.tj details,.mini{background:var(--blok)!important;
+  border:4px solid #000!important;box-shadow:inset 0 0 0 4px var(--tepi),inset -8px -8px 0 rgba(0,0,0,.35),6px 6px 0 #000!important}
+.kartu-harga.unggulan{background:var(--blok2)!important;box-shadow:inset 0 0 0 4px var(--jingga),inset -8px -8px 0 rgba(0,0,0,.35),6px 6px 0 #000!important}
+.butuh div,.tj details{padding:1.2rem 1.3rem}
+.tj{display:grid;gap:1rem}
+.tj summary::after{font-family:"Press Start 2P",monospace}
+.layar{border:4px solid #000;box-shadow:inset 0 0 0 4px var(--tepi-terang),8px 8px 0 #000!important}
+.hp{border:6px solid #000!important;box-shadow:inset 0 0 0 4px var(--tepi-terang),8px 8px 0 #000!important}
+.sampul{box-shadow:0 0 0 3px #000,0 0 0 6px var(--jingga)!important}
+.tag{font-family:"Silkscreen",monospace;box-shadow:2px 2px 0 #000}
+.nominal{font-size:clamp(1.05rem,.9rem + .8vw,1.45rem)!important;line-height:1.3!important;color:#f3e45a!important;text-shadow:3px 3px 0 #4a1a86!important}
+.nominal small{font-family:"Silkscreen",monospace;font-size:.6em}
+.kartu-harga li::before,.fitur li::before{border-radius:0!important;box-shadow:2px 2px 0 #000!important}
+.langkah li::before{font-size:1.15rem!important;color:#f3e45a!important;content:"[0" counter(l) "]"}
+.fitur h3{border-bottom:4px dashed var(--jingga)!important;box-shadow:none!important}
+section{border-top:4px solid #000!important;box-shadow:0 -4px 0 #1d1230}
+footer{border-top:4px solid #000!important;font-family:"Silkscreen",monospace}
+code{font-family:"Silkscreen",monospace;background:#22123a;color:#f3e45a;box-shadow:2px 2px 0 #000}
+.kemajuan b,.bar-vokal i{background:repeating-linear-gradient(90deg,#d58cff 0 8px,#8a2be2 8px 10px)!important;box-shadow:none!important}
+.tombol span{border:2px solid #000;box-shadow:inset -2px -2px 0 rgba(0,0,0,.4),inset 2px 2px 0 rgba(255,255,255,.12)}
+.nav{border-bottom:4px solid #000;box-shadow:0 4px 0 #1d1230}
+.nav ul a{font-family:"Silkscreen",monospace}
+.tombol-menu span{border-radius:0!important}
+.putar{border-width:4px!important}
+.petir{opacity:.35;image-rendering:pixelated}
+:focus-visible{outline:3px dashed #f3e45a!important;outline-offset:3px}
+/* layar HP sempit: jangan sampai melebar */
+.obrolan-grid>*,.perintah>*{min-width:0}
+.perintah dd,.perintah dt{overflow-wrap:anywhere}
+@media (max-width:480px){.perintah{grid-template-columns:1fr;gap:.2rem}.perintah dd{margin:0 0 .7rem}code{font-size:.8em}}
+@media (max-width:760px){.nav ul{border:4px solid #000;box-shadow:6px 6px 0 #000}}
+</style>
+</head>
+<body>
+
+<header class="wrap nav">
+  <a class="brand" href="#"><i aria-hidden="true"></i>AnLyrics</a>
+  <ul id="menu-utama">
+    <li><a href="#demo">Prosesnya</a></li>
+    <li><a href="#hasil">Hasilnya</a></li>
+    <li><a href="#cara">Cara kerja</a></li>
+    <li><a href="#fitur">Fitur</a></li>
+    <li><a href="#harga">Harga</a></li>
+    <li><a href="#tanya">Tanya jawab</a></li>
+  </ul>
+  <a class="btn btn-garis" href="https://wa.me/6282221112027?text=Halo%20admin%2C%20saya%20tertarik%20script%20bot%20musik%20Telegram" target="_blank" rel="noopener"><span class="wa-panjang">WhatsApp admin</span><span class="wa-pendek">WhatsApp</span></a>
+  <button class="tombol-menu" type="button" aria-expanded="false" aria-controls="menu-utama" aria-label="Buka menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<main>
+  <!-- HERO -->
+  <div class="hero-bg">
+  <svg class="petir" viewBox="0 0 1440 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <g fill="none" stroke="#c46bff" stroke-linejoin="miter" filter="url(#glow)">
+      <path stroke-width="3" d="M-20 120 L180 170 L150 190 L340 230 L300 250 L520 300"/>
+      <path stroke-width="2" d="M60 520 L230 450 L210 480 L380 410 L350 440 L470 400"/>
+      <path stroke-width="3" d="M1460 80 L1260 150 L1290 165 L1100 230 L1140 245 L930 320"/>
+      <path stroke-width="2" d="M1480 560 L1300 480 L1320 510 L1150 450 L1180 480 L1040 440"/>
+      <path stroke-width="1.5" opacity=".7" d="M700 -10 L720 60 L690 70 L730 150"/>
+    </g>
+  </svg>
+  <div class="wrap hero">
+    <div class="hero-grid">
+      <div>
+        <h1>Bot Telegram pembuat video lirik, karaoke, dan Shorts.</h1>
+        <p class="tagline">Semua otomatis, hanya dengan menulis judul lagu.</p>
+        <p class="lead">Hasilnya bisa langsung diupload ke channel YouTube kamu. Tinggal pasang di VPS atau panel, semua modul terpasang sendiri.</p>
+        <div class="aksi">
+          <a class="btn btn-utama" href="https://wa.me/6282221112027?text=Halo%20admin%2C%20saya%20tertarik%20script%20bot%20musik%20Telegram" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.5 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.2-.2-.5-.3z"/></svg>
+            Beli via WhatsApp
+          </a>
+          <a class="btn btn-garis" href="#harga">Lihat harga</a>
+          <a class="btn btn-garis" href="https://www.youtube.com/@Maranifarezky/videos" target="_blank" rel="noopener">Lihat contoh di YouTube</a>
+        </div>
+      </div>
+
+      <figure class="layar" aria-label="Contoh tampilan video lirik buatan bot" style="margin:0">
+        <div class="isi">
+          <div class="sampul"><span class="cap">YT : @MaraniFarezky</span></div>
+          <div class="teks">
+            <span class="tag">LYRICS</span>
+            <div class="judul">Ada Titik-Titik di Ujung Doa</div>
+            <div class="artis">Sal Priadi</div>
+            <div class="baris-lain" id="sebelum">Baris sebelumnya tampil di atas</div>
+            <div class="baris-kini" id="kini" aria-live="off"></div>
+            <div class="baris-lain" id="sesudah">Baris berikutnya menunggu di bawah</div>
+          </div>
+        </div>
+        <div class="kemajuan"><b id="maju"></b></div>
+      </figure>
+    </div>
+  </div>
+  </div>
+
+  <!-- DEMO PROSES -->
+  <section id="demo">
+    <div class="wrap">
+      <h2>Lihat prosesnya</h2>
+      <p class="lead">Begini yang terjadi setelah kamu menekan tombol di bawah lagu. Pilih jenis videonya.</p>
+      <div class="tab" role="tablist" aria-label="Jenis video">
+        <button role="tab" aria-selected="true" data-mode="lirik">🎬 Video Lirik</button>
+        <button role="tab" aria-selected="false" data-mode="karaoke">🎤 Karaoke</button>
+        <button class="ulang" type="button" aria-label="Putar ulang animasi">↻ Ulangi</button>
+      </div>
+      <div class="demo">
+        <div class="tg demo-tg" aria-live="polite">
+          <div class="pesan bot demo-lagu">🎧 <b>Ada Titik-Titik di Ujung Doa</b><br>👤 Sal Priadi</div>
+          <div class="tombol demo-tombol"><div><span class="b" data-t="lirik">🎬 Video Lirik</span><span class="g" data-t="karaoke">🎤 Karaoke</span></div><div><span>📝 Lirik</span><span>🎹 Instrumental</span></div></div>
+          <div class="pesan bot status" hidden><b class="status-judul"></b><div class="status-isi"></div></div>
+          <div class="pesan bot kirim" hidden>🎬 <b>Video terkirim</b><br><span class="kirim-ket"></span></div>
+        </div>
+        <div class="demo-layar">
+          <div class="layar demo-video">
+            <div class="kosong"><span class="putar" aria-hidden="true"></span><span class="kosong-teks">Video muncul di sini</span></div>
+            <div class="isi" hidden>
+              <div class="sampul"><span class="cap">YT : @MaraniFarezky</span></div>
+              <div class="teks">
+                <span class="tag demo-tag">LYRICS</span>
+                <div class="judul">Ada Titik-Titik di Ujung Doa</div>
+                <div class="artis">Sal Priadi</div>
+                <div class="baris-lain d-sebelum"></div>
+                <div class="baris-kini d-kini"></div>
+                <div class="baris-lain d-sesudah"></div>
+              </div>
+            </div>
+            <div class="vokal" hidden aria-hidden="true"><span>Vokal</span><div class="bar-vokal"><i></i></div></div>
+            <div class="kemajuan"><b class="d-maju"></b></div>
+          </div>
+          <p class="demo-ket">Contoh tampilan, bukan lirik asli lagu.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HASIL -->
+  <section id="hasil">
+    <div class="wrap">
+      <h2>Lima hasil dari satu lagu</h2>
+      <p class="lead">Semua dibuat otomatis di server kamu, dikirim lewat Telegram, dan siap diunggah. Contoh videonya bisa kamu tonton langsung di channel YouTube, semuanya dibuat dengan bot ini:<br><a class="tautan" href="https://www.youtube.com/@Maranifarezky/videos" target="_blank" rel="noopener">https://www.youtube.com/@Maranifarezky/videos</a></p>
+
+      <div class="hasil">
+        <div class="karya">
+          <div class="dua">
+            <figure>
+              <div class="mini">
+                <div class="isi">
+                  <div class="sampul"></div>
+                  <div class="teks"><span class="tag">LYRICS</span><div class="baris-lain" style="margin:.5em 0">Baris sebelumnya</div><div class="baris-kini">Baris yang sedang dinyanyikan</div></div>
+                </div>
+              </div>
+              <figcaption><h3>Video lirik 16:9</h3><p>Baris yang sedang dinyanyikan tampil besar, diapit baris sebelum dan sesudahnya. Jeda musik ditandai, ada progress bar dan watermark nama channel.</p></figcaption>
+            </figure>
+            <figure>
+              <div class="mini karaoke-bg">
+                <div class="isi">
+                  <div class="sampul"></div>
+                  <div class="teks"><span class="tag">KARAOKE</span><div class="baris-kini" style="margin-top:.6em"><span style="color:var(--jingga)">Kata yang sudah</span> dinyanyikan</div></div>
+                </div>
+              </div>
+              <figcaption><h3>Karaoke tanpa vokal</h3><p>Suara penyanyi dihapus dengan AI pemisah vokal. Tiap kata menyala satu per satu mengikuti nyanyian aslinya.</p></figcaption>
+            </figure>
+          </div>
+          <div class="dua-audio">
+            <div class="audio" role="img" aria-label="Contoh kiriman lagu MP3 di Telegram">
+              <div class="sampul"></div>
+              <div>
+                <h3>Lagu MP3</h3>
+                <div class="gelombang" aria-hidden="true"><i style="height:40%"></i><i style="height:80%"></i><i style="height:55%"></i><i style="height:95%"></i><i style="height:60%"></i><i style="height:35%"></i><i style="height:75%"></i><i style="height:90%"></i><i style="height:50%"></i><i style="height:70%"></i><i style="height:30%"></i><i style="height:85%"></i><i style="height:45%"></i><i style="height:65%"></i></div>
+                <p>Lagu lengkap dengan cover resmi, judul, dan nama artis.</p>
+              </div>
+            </div>
+            <div class="audio" role="img" aria-label="Contoh kiriman instrumental di Telegram">
+              <div class="sampul"></div>
+              <div>
+                <h3>Instrumental</h3>
+                <div class="gelombang datar" aria-hidden="true"><i style="height:30%"></i><i style="height:45%"></i><i style="height:35%"></i><i style="height:50%"></i><i style="height:40%"></i><i style="height:30%"></i><i style="height:45%"></i><i style="height:50%"></i><i style="height:35%"></i><i style="height:40%"></i><i style="height:30%"></i><i style="height:45%"></i><i style="height:35%"></i><i style="height:40%"></i></div>
+                <p>Lagu yang sama tanpa suara penyanyi, buat latihan atau cover.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <figure style="margin:0">
+          <div class="hp">
+            <small>Shorts · TikTok · Reels</small>
+            <div class="sampul"></div>
+            <div class="judul">Ada Titik-Titik di Ujung Doa</div>
+            <div class="baris-kini"><span style="color:var(--jingga)">Bagian reff</span> yang paling diingat</div>
+          </div>
+          <figcaption style="margin-top:1rem"><h3>Shorts 9:16</h3><p style="color:var(--kabut);font-size:.98rem">Bot mencari bagian reff penuh lagu itu sendiri, lalu memotongnya jadi video vertikal, versi lirik atau karaoke.</p></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARA KERJA -->
+  <section id="cara">
+    <div class="wrap">
+      <h2>Dari judul lagu sampai tayang di YouTube</h2>
+      <ol class="langkah">
+        <li><div><h3>Cari lagunya</h3><p>Ketik <code>.play judul lagu</code> atau tempel link Apple Music. Bot mencari di katalog resmi Apple Music dan hanya menampilkan versi asli. Versi edit, remix, sped up, slowed, cover, live, dan karaoke disaring otomatis.</p></div></li>
+        <li><div><h3>Pilih dari daftar</h3><p>Hasil tampil dalam pesan rapi bertombol nomor. Bot mengirim MP3 lengkap dengan cover resmi, judul, artis, dan album.</p></div></li>
+        <li><div><h3>Bot mencari lirik</h3><p>Lirik diambil dari database LRCLIB dan dicocokkan dengan judul, artis, serta durasi lagu (selisih maksimal 4 detik), jadi bukan lirik lagu lain. Video hanya dibuat dari lirik yang punya waktu per baris, jadi teks selalu pas dengan nyanyiannya. Kalau liriknya belum ada, admin bisa menempelkan lirik berwaktu sendiri.</p></div></li>
+        <li><div><h3>Tekan satu tombol</h3><p>Di bawah lagu ada tombol Video Lirik, Karaoke, Lirik, dan Instrumental. Progres tampil langsung di pesan: unduh, pisah vokal, menyusun video, sampai mengirim.</p></div></li>
+        <li><div><h3>Upload ke YouTube</h3><p>Pakai tombol Upload untuk mengirim video ke channel kamu, lengkap dengan judul, deskripsi, tag, dan thumbnail. Video otomatis masuk playlist LYRIC, KARAOKE, atau SHORTS. Mau upload manual juga bisa: tombol Paket YouTube memberi thumbnail 1280×720 dan deskripsi yang tersalin sekali tekan.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- TAMPILAN TELEGRAM -->
+  <section id="perintah">
+    <div class="wrap">
+      <h2>Dipakai langsung dari Telegram</h2>
+      <p class="lead">Pesan tampil rapi dengan rich message dan tombol berwarna. Semua perintah bisa diawali titik atau garis miring.</p>
+      <div class="obrolan-grid">
+        <div class="tg" role="img" aria-label="Contoh percakapan dengan bot di Telegram">
+          <div class="pesan saya">.play ada titik titik di ujung doa</div>
+          <div class="pesan bot"><b>🔎 ada titik titik di ujung doa</b>
+            <ol class="daftar">
+              <li>Ada Titik-Titik di Ujung Doa <em>· Sal Priadi</em></li>
+            </ol>
+          </div>
+          <div class="tombol"><div><span>1</span></div><div><span class="r">✖ Tutup</span></div></div>
+          <div class="pesan bot" style="margin-top:1rem">🎧 <b>Ada Titik-Titik di Ujung Doa</b><br>👤 Sal Priadi</div>
+          <div class="tombol"><div><span class="b">🎬 Video Lirik</span><span class="g">🎤 Karaoke</span></div><div><span>📝 Lirik</span><span>🎹 Instrumental</span></div></div>
+        </div>
+
+        <dl class="perintah">
+          <dt class="grup">Untuk pengguna</dt>
+          <dt><code>.play</code></dt><dd>Cari lagu resmi dan pilih dari daftar</dd>
+          <dt><code>.lv</code></dt><dd>Video lirik 16:9</dd>
+          <dt><code>.karaoke</code></dt><dd>Video karaoke tanpa vokal</dd>
+          <dt><code>.short</code> <code>.shortkr</code></dt><dd>Shorts 9:16, versi lirik atau karaoke</dd>
+          <dt><code>.inst</code></dt><dd>Instrumental tanpa vokal</dd>
+          <dt><code>.lirik</code></dt><dd>Teks lirik lagu</dd>
+          <dt class="grup">Untuk pemilik bot</dt>
+          <dt><code>/ytlogin</code></dt><dd>Hubungkan channel YouTube</dd>
+          <dt><code>/ytstatus</code></dt><dd>Cek channel, jumlah upload, dan playlist</dd>
+          <dt><code>/ytrapikan</code></dt><dd>Masukkan video lama ke playlist yang benar</dd>
+          <dt><code>/addadmin</code> <code>/deladmin</code></dt><dd>Atur siapa yang boleh memakai bot</dd>
+          <dt><code>/listadmin</code></dt><dd>Lihat daftar admin</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- FITUR LENGKAP -->
+  <section id="fitur">
+    <div class="wrap">
+      <h2>Semua fiturnya</h2>
+      <div class="fitur">
+        <div>
+          <h3>Lagu &amp; lirik</h3>
+          <ul>
+            <li><strong>Hanya lagu resmi.</strong> Daftar lagu dari katalog Apple Music, versi turunan disaring, lagu yang sama di single dan album cukup tampil sekali.</li>
+            <li><strong>Cover resmi 600px</strong> dan info lagu lengkap: judul, artis, album, durasi.</li>
+            <li><strong>Lirik berwaktu dari LRCLIB</strong> yang dicocokkan dengan judul, artis, dan durasi.</li>
+            <li><strong>Isi lirik sendiri</strong>: lagu yang liriknya belum ada bisa diisi admin dengan lirik berwaktu (format LRC).</li>
+            <li><strong>Teks lirik dirapikan</strong>: spasi, tanda baca, dan karakter tak terlihat dibersihkan.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Video</h3>
+          <ul>
+            <li><strong>Video lirik HD 16:9</strong> dengan baris sebelum, sekarang, dan sesudah.</li>
+            <li><strong>Karaoke per kata</strong>: vokal dihapus dengan AI, kata menyala mengikuti nyanyian.</li>
+            <li><strong>Shorts 9:16</strong> dari bagian reff penuh, dipilih otomatis.</li>
+            <li><strong>Watermark nama channel</strong> di bawah cover, bisa diganti.</li>
+            <li><strong>Huruf lengkap</strong>, termasuk huruf Jepang, Korea, dan Mandarin.</li>
+            <li><strong>Kirim ulang instan</strong>: video yang pernah dibuat langsung dikirim lagi tanpa render ulang.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>YouTube</h3>
+          <ul>
+            <li><strong>Upload langsung</strong> ke channel kamu lewat YouTube Data API resmi, tahan koneksi putus.</li>
+            <li><strong>Playlist otomatis</strong>: LYRIC, KARAOKE, dan SHORTS dibuat dan diisi sendiri.</li>
+            <li><strong>Auto-upload opsional</strong>: setiap video baru langsung naik.</li>
+            <li><strong>Paket YouTube</strong>: thumbnail 1280×720, judul, deskripsi, dan tag siap tempel.</li>
+            <li><strong>Hanya pemilik</strong> yang bisa memakai tombol upload.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Pengelolaan bot</h3>
+          <ul>
+            <li><strong>Mode private</strong>: hanya pemilik dan admin yang bisa memakai bot. Orang baru diarahkan ke admin, dan pemilik dapat notifikasi dengan tombol beri akses.</li>
+            <li><strong>Arsip otomatis</strong>: hasil video tersalin diam-diam ke channel Telegram kamu.</li>
+            <li><strong>Antrean dan cooldown</strong> supaya server tidak kewalahan.</li>
+            <li><strong>Persiapan di belakang layar</strong>: vokal dipisah lebih dulu begitu lagu dikirim, jadi karaoke lebih cepat.</li>
+            <li><strong>Install otomatis</strong>: modul terpasang sendiri saat pertama jalan, termasuk di Ubuntu terbaru.</li>
+            <li><strong>Data aman saat update</strong>: login YouTube, admin, dan cache disimpan di luar folder bot.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KEBUTUHAN -->
+  <section id="butuh">
+    <div class="wrap">
+      <h2>Yang kamu butuhkan</h2>
+      <div class="butuh">
+        <div><h3>Server</h3><p>VPS Linux (Ubuntu disarankan) atau panel Pterodactyl dengan Python 3.10 ke atas. RAM 2 GB atau lebih supaya pemisah vokal lancar.</p></div>
+        <div><h3>Akun Telegram</h3><p>Token bot dari @BotFather, plus API ID dan API Hash dari my.telegram.org.</p></div>
+        <div><h3>Opsional: YouTube</h3><p>Project Google Cloud dengan YouTube Data API aktif, kalau ingin upload langsung dari bot.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HARGA -->
+  <section id="harga">
+    <div class="wrap">
+      <h2>Harga</h2>
+      <p class="lead">Mau coba dulu? Sewa per bulan. Mau punya sendiri? Beli scriptnya, bayar sekali.</p>
+      <div class="paket">
+        <div class="kartu-harga">
+          <h3>Sewa</h3>
+          <p class="nominal">Rp250.000<small>/bulan</small></p>
+          <ul>
+            <li>Pakai bot tanpa beli script</li>
+            <li>Semua fitur di halaman ini</li>
+            <li>Dibayar per bulan</li>
+          </ul>
+          <a class="btn btn-garis" href="https://wa.me/6282221112027?text=Halo%20admin%2C%20saya%20mau%20sewa%20bot%20musik%20(Rp250.000%2Fbulan)" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.5 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.2-.2-.5-.3z"/></svg>Sewa sekarang</a>
+        </div>
+        <div class="kartu-harga">
+          <h3>Beli Tanpa Update</h3>
+          <p class="nominal">Rp1.000.000</p>
+          <ul>
+            <li>Script bot lengkap dengan semua fitur di halaman ini</li>
+            <li>Versi saat pembelian</li>
+            <li>Update versi berikutnya tidak termasuk</li>
+          </ul>
+          <a class="btn btn-garis" href="https://wa.me/6282221112027?text=Halo%20admin%2C%20saya%20mau%20beli%20script%20bot%20musik%20paket%20Tanpa%20Update%20(Rp1.000.000)" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.5 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.2-.2-.5-.3z"/></svg>Beli paket ini</a>
+        </div>
+        <div class="kartu-harga unggulan">
+          <h3>Beli Full Update</h3>
+          <p class="nominal">Rp2.500.000</p>
+          <ul>
+            <li>Script bot lengkap dengan semua fitur di halaman ini</li>
+            <li>Dapat semua update versi berikutnya</li>
+            <li>Update tinggal timpa file, data tetap aman</li>
+          </ul>
+          <a class="btn btn-utama" href="https://wa.me/6282221112027?text=Halo%20admin%2C%20saya%20mau%20beli%20script%20bot%20musik%20paket%20Full%20Update%20(Rp2.500.000)" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.5 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.2-.2-.5-.3z"/></svg>Beli paket ini</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TANYA JAWAB -->
+  <section id="tanya">
+    <div class="wrap">
+      <h2>Tanya jawab</h2>
+      <div class="tj">
+        <details>
+          <summary>Apakah bisa dibeli atau disewa?</summary>
+          <p>Script dijual dua paket: <strong>Tanpa Update Rp1.000.000</strong> dan <strong>Full Update Rp2.500.000</strong>. Bisa juga sewa <strong>Rp250.000 per bulan</strong>. Untuk cara pembayaran, chat admin lewat WhatsApp 0822-2111-2027: <a class="tautan" href="https://wa.me/6282221112027?text=Halo%20admin%2C%20saya%20tertarik%20script%20bot%20musik%20Telegram" target="_blank" rel="noopener">https://wa.me/6282221112027</a>.</p>
+        </details>
+        <details>
+          <summary>Bisa request fitur baru?</summary>
+          <p>Bisa. Kirim ide fiturnya ke admin lewat WhatsApp: <a class="tautan" href="https://wa.me/6282221112027?text=Halo%20admin%2C%20saya%20mau%20request%20fitur%20untuk%20bot%20musik" target="_blank" rel="noopener">https://wa.me/6282221112027</a>. Harga request fitur tergantung tingkat kesulitan coding yang dibuat.</p>
+        </details>
+        <details>
+          <summary>Bisa lihat contoh hasilnya dulu?</summary>
+          <p>Bisa. Semua video di channel YouTube <a class="tautan" href="https://www.youtube.com/@Maranifarezky/videos" target="_blank" rel="noopener">https://www.youtube.com/@Maranifarezky/videos</a> dibuat dengan bot ini: video lirik, karaoke, dan Shorts.</p>
+        </details>
+        <details>
+          <summary>Apakah liriknya selalu ada?</summary>
+          <p>Lirik diambil dari database LRCLIB, dengan Genius sebagai cadangan teks. Lagu populer umumnya sudah lengkap dengan waktu per baris. Video lirik dan karaoke hanya dibuat dari lirik berwaktu, supaya tidak meleset. Kalau lagu itu belum punya lirik berwaktu, bot memberi tahu begitu lagunya dikirim, dan admin bisa menempelkan lirik berwaktu sendiri dengan <code>.setlirik</code>.</p>
+        </details>
+        <details>
+          <summary>Berapa lama video dibuat?</summary>
+          <p>Tergantung kekuatan server dan panjang lagu. Pemisahan vokal untuk karaoke paling berat. Video yang sudah pernah dibuat dikirim ulang seketika tanpa render.</p>
+        </details>
+        <details>
+          <summary>Kenapa video yang diupload lewat bot jadi Pribadi?</summary>
+          <p>Ini aturan YouTube: project Google Cloud yang belum lolos audit YouTube API akan dikunci ke mode Pribadi untuk video yang diupload lewat API. Ajukan audit ke Google supaya bisa Publik, atau pakai Paket YouTube lalu upload manual dari YouTube Studio.</p>
+        </details>
+        <details>
+          <summary>Apakah perlu paham coding?</summary>
+          <p>Tidak. Isi token bot, lalu jalankan <code>python3 main.py</code>. Semua modul terpasang otomatis, dan panduan lengkap ada di README.</p>
+        </details>
+        <details>
+          <summary>Bagaimana kalau ada update?</summary>
+          <p>Update hanya didapat di paket <strong>Full Update (Rp2.500.000)</strong>. Paket Tanpa Update (Rp1.000.000) memakai versi saat pembelian. Cara pasang update: timpa file lama dengan versi baru lalu restart. Login YouTube, daftar admin, dan cache tetap aman karena disimpan di luar folder bot.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- PENUTUP -->
+  <div class="akhir">
+    <div class="wrap">
+      <h2>Punya channel musik? Biar bot yang bikin videonya.</h2>
+      <p class="lead">Tanya harga, minta demo, request fitur, atau konsultasi pemasangan langsung ke admin lewat WhatsApp 0822-2111-2027.</p>
+      <div class="aksi">
+        <a class="btn btn-utama" href="https://wa.me/6282221112027?text=Halo%20admin%2C%20saya%20tertarik%20script%20bot%20musik%20Telegram" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.5 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.2-.2-.5-.3z"/></svg>
+          Chat admin di WhatsApp
+        </a>
+        <a class="btn btn-garis" href="https://www.youtube.com/@Maranifarezky/videos" target="_blank" rel="noopener">Tonton contoh di YouTube</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 AnLyrics · YouTube @Maranifarezky</span>
+  </div>
+</footer>
+
+<script>
+/* Satu-satunya animasi: baris lirik di hero menyala per kata, seperti hasil bot */
+(function(){
+  /* contoh tampilan saja, bukan lirik lagu aslinya */
+  var baris=[
+    ["Tiap", "kata", "menyala", "ikut", "suara"],
+    ["Baris", "lirik", "yang", "sedang", "dinyanyikan"],
+    ["Pas", "dengan", "nyanyian", "penyanyinya"]
+  ];
+  var kini=document.getElementById("kini"),sebelum=document.getElementById("sebelum"),
+      sesudah=document.getElementById("sesudah"),maju=document.getElementById("maju");
+  var diam=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var i=0,progres=8;
+  function tampil(){
+    var kata=baris[i];
+    sebelum.textContent=i?baris[i-1].join(" "):"Baris sebelumnya tampil di atas";
+    sesudah.textContent=baris[(i+1)%baris.length].join(" ");
+    kini.innerHTML=kata.map(function(k){return '<span class="kata">'+k+'</span>'}).join(" ");
+    var el=kini.querySelectorAll(".kata"),t=300;
+    el.forEach(function(e,n){
+      var d=0.25+0.09*k_len(kata[n]);
+      e.style.setProperty("--d",d+"s");
+      setTimeout(function(){e.classList.add("nyala")},diam?0:t);
+      t+=d*1000+80;
+    });
+    progres=Math.min(96,progres+9);maju.style.width=progres+"%";
+    if(diam) return;
+    setTimeout(function(){i=(i+1)%baris.length;if(!i)progres=8;tampil()},t+1100);
+  }
+  function k_len(s){return Math.max(1,s.replace(/[^aiueo]/gi,"").length)}
+  tampil();
+})();
+
+/* ---------- demo proses pembuatan video ---------- */
+(function(){
+  var root=document.getElementById("demo"); if(!root) return;
+  var diam=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var tabs=root.querySelectorAll('[role="tab"]'), ulang=root.querySelector(".ulang");
+  var st=root.querySelector(".status"), stJudul=root.querySelector(".status-judul"), stIsi=root.querySelector(".status-isi");
+  var kirim=root.querySelector(".kirim"), kirimKet=root.querySelector(".kirim-ket");
+  var kosong=root.querySelector(".kosong"), kosongT=root.querySelector(".kosong-teks"), isi=root.querySelector(".demo-video .isi");
+  var tag=root.querySelector(".demo-tag"), dSeb=root.querySelector(".d-sebelum"), dKini=root.querySelector(".d-kini"), dSes=root.querySelector(".d-sesudah");
+  var maju=root.querySelector(".d-maju"), vokal=root.querySelector(".vokal"), barV=root.querySelector(".bar-vokal i");
+  var mode="lirik", run=0, mulai=false;
+  var LIRIK=[["Baris","pertama","tampil","di","sini"],["Kata","menyala","ikut","suara"],["Jeda","musik","ditandai","titik"],["Lalu","baris","berikutnya","muncul"]];
+  function tidur(ms,id){return new Promise(function(ok,no){setTimeout(function(){id===run?ok():no("batal")},diam?0:ms)})}
+  function bar(f){var n=Math.round(f*12);return "▰".repeat(n)+"▱".repeat(12-n)}
+  function baris(teks,id){var d=document.createElement("div");d.className="baru";d.textContent=teks;stIsi.appendChild(d);return d}
+  function reset(){
+    st.hidden=true;kirim.hidden=true;stIsi.innerHTML="";isi.hidden=true;vokal.hidden=true;barV.style.width="100%";
+    kosong.hidden=false;kosong.classList.remove("sibuk");kosongT.textContent="Video muncul di sini";maju.style.width="0";
+    root.querySelectorAll(".demo-tombol span").forEach(function(b){b.classList.remove("tekan")});
+  }
+  async function langkah(teks,selesai,ms,id){var d=baris(teks);await tidur(ms,id);d.textContent=selesai;return d}
+  async function persen(label,ms,id,akhir){var d=baris(label+" "+bar(0)+" 0%");for(var i=1;i<=10;i++){await tidur(ms/10,id);d.textContent=label+" "+bar(i/10)+" "+(i*10)+"%"}if(akhir)d.textContent=akhir;return d}
+  async function main(){
+    var id=++run;reset();
+    var kar=mode==="karaoke";
+    try{
+      await tidur(700,id);
+      var tb=root.querySelector('.demo-tombol [data-t="'+mode+'"]');tb.classList.add("tekan");
+      await tidur(350,id);tb.classList.remove("tekan");
+      st.hidden=false;stJudul.textContent=kar?"🎤 Karaoke":"🎬 Video Lirik";
+      kosong.classList.add("sibuk");kosongT.textContent="Bot sedang membuat video…";
+      await langkah("⬇️ Mengunduh audio…","✅ Audio siap",900,id);
+      await langkah("🔍 Mencari lirik bersinkron…","✅ Lirik ketemu (24 baris)",900,id);
+      if(kar){
+        vokal.hidden=false;
+        var d=baris("🧠 Memisahkan vokal (AI) "+bar(0)+" 0%");
+        for(var i=1;i<=10;i++){await tidur(220,id);d.textContent="🧠 Memisahkan vokal (AI) "+bar(i/10)+" "+(i*10)+"%";barV.style.width=(100-i*10)+"%"}
+        d.textContent="✅ Vokal dihapus (AI)";
+        await langkah("🎯 Menyamakan kata dengan suara penyanyi…","✅ Kata disamakan dengan suara penyanyi",900,id);
+      }
+      await persen("🎞️ Menyusun video",1600,id,"✅ Video selesai");
+      await langkah("📤 Mengirim video…","✅ Terkirim",700,id);
+      kirim.hidden=false;kirimKet.textContent=kar?"Karaoke · vokal dihapus dengan AI":"Video lirik 16:9";
+      kosong.hidden=true;vokal.hidden=true;isi.hidden=false;tag.textContent=kar?"KARAOKE":"LYRICS";
+      for(var r=0;r<LIRIK.length;r++){
+        dSeb.textContent=r?LIRIK[r-1].join(" "):"";dSes.textContent=LIRIK[(r+1)%LIRIK.length].join(" ");
+        maju.style.width=((r+1)/LIRIK.length*100)+"%";
+        if(kar){
+          dKini.innerHTML=LIRIK[r].map(function(k){return '<span class="kata">'+k+'</span>'}).join(" ");
+          var el=dKini.querySelectorAll(".kata");
+          for(var k=0;k<el.length;k++){el[k].style.setProperty("--d","0.42s");el[k].classList.add("nyala");await tidur(500,id)}
+          await tidur(500,id);
+        }else{
+          dKini.textContent=LIRIK[r].join(" ");await tidur(1900,id);
+        }
+      }
+      await tidur(1800,id);main();
+    }catch(e){}
+  }
+  tabs.forEach(function(t){t.addEventListener("click",function(){
+    tabs.forEach(function(x){x.setAttribute("aria-selected",x===t?"true":"false")});mode=t.dataset.mode;main();})});
+  ulang.addEventListener("click",function(){main()});
+  if("IntersectionObserver" in window){
+    new IntersectionObserver(function(es,o){es.forEach(function(e){if(e.isIntersecting&&!mulai){mulai=true;main();o.disconnect()}})},{threshold:.3}).observe(root);
+  }else{main()}
+})();
+
+
+/* ---------- menu HP ---------- */
+(function(){
+  var b=document.querySelector(".tombol-menu"), m=document.getElementById("menu-utama"); if(!b||!m) return;
+  function set(buka){m.classList.toggle("buka",buka);b.setAttribute("aria-expanded",buka?"true":"false");b.setAttribute("aria-label",buka?"Tutup menu":"Buka menu")}
+  b.addEventListener("click",function(){set(!m.classList.contains("buka"))});
+  m.addEventListener("click",function(e){if(e.target.closest("a"))set(false)});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false)});
+  document.addEventListener("click",function(e){if(!e.target.closest(".nav"))set(false)});
+})();
+</script>
+</body>
+</html>
